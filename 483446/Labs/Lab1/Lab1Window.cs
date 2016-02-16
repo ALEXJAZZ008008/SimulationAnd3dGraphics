@@ -30,9 +30,9 @@ namespace Labs.Lab1
         {
             GL.ClearColor(Color4.ForestGreen);
 
-            float[] vertices = new float[] { -0.8f, -0.8f,
-                                             -0.8f, 0.8f,
-                                             0.8f, 0.8f };
+            float[] vertices = new float[] { -0.8f, 0.8f,
+                                             -0.8f, -0.8f,
+                                             0.8f, 0.8f };
 
             GL.GenBuffers(1, out mVertexBufferObjectID);
             GL.BindBuffer(BufferTarget.ArrayBuffer, mVertexBufferObjectID);
@@ -51,6 +51,8 @@ namespace Labs.Lab1
             mShader = new ShaderUtility( @"Lab1/Shaders/vSimple.vert", @"Lab1/Shaders/fSimple.frag");
 
             #endregion
+
+            GL.Enable(EnableCap.CullFace);
 
             base.OnLoad(e);
         }
