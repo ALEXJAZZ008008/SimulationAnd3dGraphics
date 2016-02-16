@@ -76,7 +76,7 @@ namespace Labs.Lab1
 
             #endregion
 
-            GL.DrawArrays(PrimitiveType.Triangles, 0, 6);
+            GL.DrawArrays(PrimitiveType.Triangles, 3, 6);
 
             this.SwapBuffers();
         }
