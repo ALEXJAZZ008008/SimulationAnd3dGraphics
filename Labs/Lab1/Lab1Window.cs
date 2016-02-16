@@ -32,7 +32,10 @@ namespace Labs.Lab1
 
             float[] vertices = new float[] { -0.8f, 0.8f,
                                              -0.8f, -0.8f,
-                                             0.8f, 0.8f };
+                                             0.8f, 0.8f,
+                                             -0.8f, -0.8f,
+                                             0.8f, -0.8f,
+                                             0.8f, 0.8f};
 
             GL.GenBuffers(1, out mVertexBufferObjectID);
             GL.BindBuffer(BufferTarget.ArrayBuffer, mVertexBufferObjectID);
@@ -73,7 +76,7 @@ namespace Labs.Lab1
 
             #endregion
 
-            GL.DrawArrays(PrimitiveType.Triangles, 0, 3);
+            GL.DrawArrays(PrimitiveType.Triangles, 0, 6);
 
             this.SwapBuffers();
         }
