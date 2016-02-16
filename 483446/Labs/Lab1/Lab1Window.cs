@@ -30,41 +30,15 @@ namespace Labs.Lab1
         {
             GL.ClearColor(Color4.ForestGreen);
 
-            float[] vertices = new float[] {-0.2f, 0.8f,
-                                            0.0f, 0.8f,
-                                            -0.2f, 0.6f,
-                                            0.0f, 0.6f,
-                                            -0.4f, 0.6f,
-                                            -0.8f, 0.2f,
-                                            0.4f, 0.6f,
-                                            0.8f, 0.2f,
-                                            -0.6f, 0.2f,
-                                            -0.4f, 0.2f,
+            float[] vertices = new float[] {0.0f, 0.8f,
+                                            0.8f, 0.4f,
+                                            0.6f, -0.6f,
                                             -0.6f, -0.6f,
-                                            -0.4f, -0.6f,
-                                            -0.4f, -0.2f,
-                                            0.2f, -0.2f,
-                                            0.2f, -0.6f,
-                                            0.0f, 0.2f,
-                                            0.6f, 0.2f,
-                                            0.0f, -0.2f,
-                                            0.6f, -0.2f,
-                                            0.4f, -0.2f,
-                                            0.4f, -0.6f,
-                                            0.6f, -0.6f};
-
-            int[] indices = new int[] {2, 1, 0,
-                                       2, 3, 1,
-                                       5, 6, 4,
-                                       5, 7, 6,
-                                       10, 9, 8,
-                                       10, 11, 9,
-                                       11, 13, 12,
-                                       11, 14, 13,
-                                       17, 16, 15,
-                                       17, 18, 16,
-                                       20, 18, 19,
-                                       20, 21, 18};
+                                            -0.8f, 0.4f};
+            
+            uint[] indices = new uint[] {0, 2, 1,
+                                         0, 3, 2,
+                                         0, 4, 3};
 
             GL.GenBuffers(2, mVertexBufferObjectIDArray);
 
