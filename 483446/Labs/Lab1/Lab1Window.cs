@@ -68,7 +68,7 @@ namespace Labs.Lab1
 
             #endregion
 
-            //GL.Enable(EnableCap.CullFace);
+            GL.Enable(EnableCap.CullFace);
 
             base.OnLoad(e);
         }
