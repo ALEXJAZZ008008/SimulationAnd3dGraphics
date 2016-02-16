@@ -28,7 +28,7 @@ namespace Labs.Lab1
 
         protected override void OnLoad(EventArgs e)
         {
-            GL.ClearColor(Color4.White);
+            GL.ClearColor(Color4.ForestGreen);
 
             float[] vertices = new float[] { -0.8f, -0.8f,
                                              -0.8f, 0.8f,
