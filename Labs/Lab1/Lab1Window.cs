@@ -30,13 +30,41 @@ namespace Labs.Lab1
         {
             GL.ClearColor(Color4.ForestGreen);
 
-            float[] vertices = new float[] {-0.4f, 0.0f,
-                                            0.4f, 0.0f,
-                                            0.0f, 0.6f,                                            -0.8f, -0.6f,
-                                            0.0f, -0.6f,
-                                            0.8f, -0.6f};
+            float[] vertices = new float[] {-0.2f, 0.8f,
+                                            0.0f, 0.8f,
+                                            -0.2f, 0.6f,
+                                            0.0f, 0.6f,
+                                            -0.4f, 0.6f,
+                                            -0.8f, 0.2f,
+                                            0.4f, 0.6f,
+                                            0.8f, 0.2f,
+                                            -0.6f, 0.2f,
+                                            -0.4f, 0.2f,
+                                            -0.6f, -0.6f,
+                                            -0.4f, -0.6f,
+                                            -0.4f, -0.2f,
+                                            0.2f, -0.2f,
+                                            0.2f, -0.6f,
+                                            0.0f, 0.2f,
+                                            0.6f, 0.2f,
+                                            0.0f, -0.2f,
+                                            0.6f, -0.2f,
+                                            0.4f, -0.2f,
+                                            0.4f, -0.6f,
+                                            0.6f, -0.6f};
 
-            int[] indices = new int[] {0, 1, 2, 3, 4, 0, 4, 5, 1};
+            int[] indices = new int[] {2, 1, 0,
+                                       2, 3, 1,
+                                       5, 6, 4,
+                                       5, 7, 6,
+                                       10, 9, 8,
+                                       10, 11, 9,
+                                       11, 13, 12,
+                                       11, 14, 13,
+                                       17, 16, 15,
+                                       17, 18, 16,
+                                       20, 18, 19,
+                                       20, 21, 18};
 
             GL.GenBuffers(2, mVertexBufferObjectIDArray);
 
@@ -66,7 +94,7 @@ namespace Labs.Lab1
 
             #endregion
 
-            GL.Enable(EnableCap.CullFace);
+            //GL.Enable(EnableCap.CullFace);
 
             base.OnLoad(e);
         }
@@ -88,7 +116,7 @@ namespace Labs.Lab1
 
             #endregion
 
-            GL.DrawElements(PrimitiveType.Triangles, 9, DrawElementsType.UnsignedInt, 0);
+            GL.DrawElements(PrimitiveType.Triangles, 36, DrawElementsType.UnsignedInt, 0);
 
             this.SwapBuffers();
         }
