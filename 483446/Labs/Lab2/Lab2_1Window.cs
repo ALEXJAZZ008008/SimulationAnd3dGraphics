@@ -8,7 +8,6 @@ namespace Labs.Lab2
 {
     class Lab2_1Window : GameWindow
     {        
-
         private int[] mVertexBufferObjectIDArray = new int[2];
         private ShaderUtility mShader;
 
@@ -84,6 +83,9 @@ namespace Labs.Lab2
             GL.VertexAttribPointer(vPositionLocation, 2, VertexAttribPointerType.Float, false, 2 * sizeof(float), 0);
 
             #endregion
+
+            int uColourLocation = GL.GetUniformLocation(mShader.ShaderProgramID, "uColour");
+            GL.Uniform4(uColourLocation, Color4.Red);
 
             GL.DrawElements(PrimitiveType.Triangles, 3, DrawElementsType.UnsignedInt, 0);
 
