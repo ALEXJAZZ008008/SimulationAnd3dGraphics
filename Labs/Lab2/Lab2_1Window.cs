@@ -8,6 +8,7 @@ namespace Labs.Lab2
 {
     class Lab2_1Window : GameWindow
     {        
+
         private int[] mVertexBufferObjectIDArray = new int[2];
         private ShaderUtility mShader;
 
