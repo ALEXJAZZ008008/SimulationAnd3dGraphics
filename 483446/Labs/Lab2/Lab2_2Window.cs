@@ -78,8 +78,13 @@ namespace Labs.Lab2
         {
             base.OnRenderFrame(e);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-            
+
             GL.BindVertexArray(mVAO_ID);
+
+            int uModelLocation = GL.GetUniformLocation(mShader.ShaderProgramID, "uModel");
+            Matrix4 m1 = Matrix4.CreateTranslation(1, 0, 0);
+            GL.UniformMatrix4(uModelLocation, true, ref m1);
+
             GL.DrawElements(BeginMode.Triangles, mModel.Indices.Length, DrawElementsType.UnsignedInt, 0);
             
             GL.BindVertexArray(0);
