@@ -62,31 +62,8 @@ namespace Labs.Lab2
             if (mShader != null)
             {
                 int uProjectionLocation = GL.GetUniformLocation(mShader.ShaderProgramID, "uProjection");
-                float windowHeight = this.ClientRectangle.Height;
-                float windowWidth = this.ClientRectangle.Width;
-
-                if (windowHeight > windowWidth)
-                {
-                    if (windowWidth < 1)
-                    {
-                        windowWidth = 1;
-                    }
-
-                    float ratio = windowHeight / windowWidth;
-                    Matrix4 projection = Matrix4.CreateOrthographic(10 / ratio, 10, -1, 1);
-                    GL.UniformMatrix4(uProjectionLocation, true, ref projection);
-                }
-                else
-                {
-                    if (windowHeight < 1)
-                    {
-                        windowHeight = 1;
-                    }
-
-                    float ratio = windowWidth / windowHeight;
-                    Matrix4 projection = Matrix4.CreateOrthographic(10, 10 / ratio, -1, 1);
-                    GL.UniformMatrix4(uProjectionLocation, true, ref projection);
-                }
+                Matrix4 projection = Matrix4.CreatePerspectiveFieldOfView(1, (float)ClientRectangle.Width / ClientRectangle.Height, 0.5f, 5);
+                GL.UniformMatrix4(uProjectionLocation, true, ref projection);
             }
         }
 
@@ -132,12 +109,12 @@ namespace Labs.Lab2
 
             GL.BindVertexArray(0);
 
-            mView = Matrix4.Identity;
+            mView = Matrix4.CreateTranslation(0, 0, -2);
             int uView = GL.GetUniformLocation(mShader.ShaderProgramID, "uView");
             GL.UniformMatrix4(uView, true, ref mView);
 
             int uProjectionLocation = GL.GetUniformLocation(mShader.ShaderProgramID, "uProjection");
-            Matrix4 projection = Matrix4.CreateOrthographic(10, 10, -1, 1);
+            Matrix4 projection = Matrix4.CreatePerspectiveFieldOfView(1, (float)ClientRectangle.Width / ClientRectangle.Height, 0.5f, 5);
             GL.UniformMatrix4(uProjectionLocation, true, ref projection);
 
             base.OnLoad(e);
