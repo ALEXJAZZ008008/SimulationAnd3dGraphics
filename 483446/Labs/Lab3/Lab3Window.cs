@@ -170,6 +170,22 @@ namespace Labs.Lab3
                 Matrix4 inverseTranslation = Matrix4.CreateTranslation(-t);
                 mGroundModel = mGroundModel * inverseTranslation * Matrix4.CreateRotationY(0.025f) * translation;
             }
+
+            if (e.KeyChar == 'c')
+            {
+                Vector3 t = mGroundModel.ExtractTranslation();
+                Matrix4 translation = Matrix4.CreateTranslation(t);
+                Matrix4 inverseTranslation = Matrix4.CreateTranslation(-t);
+                mSphereModel = mSphereModel * inverseTranslation * Matrix4.CreateRotationY(-0.025f) * translation;
+            }
+
+            if (e.KeyChar == 'v')
+            {
+                Vector3 t = mGroundModel.ExtractTranslation();
+                Matrix4 translation = Matrix4.CreateTranslation(t);
+                Matrix4 inverseTranslation = Matrix4.CreateTranslation(-t);
+                mSphereModel = mSphereModel * inverseTranslation * Matrix4.CreateRotationY(0.025f) * translation;
+            }
         }
 
         protected override void OnRenderFrame(FrameEventArgs e)
