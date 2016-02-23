@@ -58,6 +58,36 @@ namespace Labs.Lab2
         {
             base.OnResize(e);
             GL.Viewport(this.ClientRectangle);
+
+            if (mShader != null)
+            {
+                int uProjectionLocation = GL.GetUniformLocation(mShader.ShaderProgramID, "uProjection");
+                float windowHeight = this.ClientRectangle.Height;
+                float windowWidth = this.ClientRectangle.Width;
+
+                if (windowHeight > windowWidth)
+                {
+                    if (windowWidth < 1)
+                    {
+                        windowWidth = 1;
+                    }
+
+                    float ratio = windowHeight / windowWidth;
+                    Matrix4 projection = Matrix4.CreateOrthographic(10 / ratio, 10, -1, 1);
+                    GL.UniformMatrix4(uProjectionLocation, true, ref projection);
+                }
+                else
+                {
+                    if (windowHeight < 1)
+                    {
+                        windowHeight = 1;
+                    }
+
+                    float ratio = windowWidth / windowHeight;
+                    Matrix4 projection = Matrix4.CreateOrthographic(10, 10 / ratio, -1, 1);
+                    GL.UniformMatrix4(uProjectionLocation, true, ref projection);
+                }
+            }
         }
 
         protected override void OnLoad(EventArgs e)
