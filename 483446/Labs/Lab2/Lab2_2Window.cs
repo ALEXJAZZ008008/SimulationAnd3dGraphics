@@ -82,16 +82,21 @@ namespace Labs.Lab2
             GL.BindVertexArray(mVAO_ID);
 
             int uModelLocation = GL.GetUniformLocation(mShader.ShaderProgramID, "uModel");
-            Matrix4 m1 = Matrix4.CreateTranslation(1, 0, 0);
-            GL.UniformMatrix4(uModelLocation, true, ref m1);
+
+            Matrix4 m1 = Matrix4.CreateTranslation(0.5f, 0, 0);
+            Matrix4 m2 = Matrix4.CreateRotationZ(0.8f);
+            Matrix4 m3 = m1 * m2;
+            GL.UniformMatrix4(uModelLocation, true, ref m3);
 
             GL.DrawElements(BeginMode.Triangles, mModel.Indices.Length, DrawElementsType.UnsignedInt, 0);
 
-            Matrix4 m2 = Matrix4.CreateTranslation(-0.5f, 0.5f, 0);
-            GL.UniformMatrix4(uModelLocation, true, ref m2);
+            Matrix4 m4 = Matrix4.CreateRotationZ(0.8f);
+            Matrix4 m5 = Matrix4.CreateTranslation(-0.5f, 0, 0);
+            Matrix4 m6 = m4 * m5;
+            GL.UniformMatrix4(uModelLocation, true, ref m6);
 
             GL.DrawElements(BeginMode.Triangles, mModel.Indices.Length, DrawElementsType.UnsignedInt, 0);
-            
+
             GL.BindVertexArray(0);
             this.SwapBuffers();
         }
