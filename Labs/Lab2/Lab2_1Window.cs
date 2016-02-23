@@ -166,7 +166,11 @@ namespace Labs.Lab2
             GL.BindBuffer(BufferTarget.ArrayBuffer, mTriangleVertexBufferObjectIDArray[0]);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, mTriangleVertexBufferObjectIDArray[1]);
 
+            #region Shader Loading Code
+
             GL.VertexAttribPointer(vPositionLocation, 3, VertexAttribPointerType.Float, false, 3 *sizeof(float), 0);
+
+            #endregion
 
             GL.DrawElements(PrimitiveType.Triangles, 3, DrawElementsType.UnsignedInt, 0);
             
