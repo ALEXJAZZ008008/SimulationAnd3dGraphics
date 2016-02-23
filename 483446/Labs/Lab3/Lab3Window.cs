@@ -136,9 +136,10 @@ namespace Labs.Lab3
 
             if (e.KeyChar == 'a')
             {
-                mView = mView * Matrix4.CreateRotationY(-0.025f);
-                int uView = GL.GetUniformLocation(mShader.ShaderProgramID, "uView");
-                GL.UniformMatrix4(uView, true, ref mView);            
+                Vector3 t = mGroundModel.ExtractTranslation();
+                Matrix4 translation = Matrix4.CreateTranslation(t);
+                Matrix4 inverseTranslation = Matrix4.CreateTranslation(-t);
+                mGroundModel = mGroundModel * inverseTranslation * Matrix4.CreateRotationY(-0.025f) * translation;
             }
 
             if (e.KeyChar == 's')
@@ -150,9 +151,10 @@ namespace Labs.Lab3
 
             if (e.KeyChar == 'd')
             {
-                mView = mView * Matrix4.CreateRotationY(0.025f);
-                int uView = GL.GetUniformLocation(mShader.ShaderProgramID, "uView");
-                GL.UniformMatrix4(uView, true, ref mView);
+                Vector3 t = mGroundModel.ExtractTranslation();
+                Matrix4 translation = Matrix4.CreateTranslation(t);
+                Matrix4 inverseTranslation = Matrix4.CreateTranslation(-t);
+                mGroundModel = mGroundModel * inverseTranslation * Matrix4.CreateRotationY(0.025f) * translation;
             }
         }
 
