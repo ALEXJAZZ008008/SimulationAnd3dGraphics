@@ -32,7 +32,7 @@ namespace Labs.Lab3
         protected override void OnLoad(EventArgs e)
         {
             // Set some GL state
-            GL.ClearColor(Color4.Black);
+            GL.ClearColor(Color4.White);
             GL.Enable(EnableCap.DepthTest);
             GL.Enable(EnableCap.CullFace);
 
