@@ -34,18 +34,18 @@ namespace Labs.Lab2
 
             #region squareVertices
 
-            float[] squareVertices = new float[] { -0.2f, -0.4f, 0.2f, 1.0f, 0.0f, 1.0f,
+            float[] squareVertices = new float[] { -0.2f, -0.4f, 0.2f, 1.0f, 1.0f, 0.0f,
                                                    0.8f, -0.4f, 0.2f, 1.0f, 0.0f, 1.0f,
-                                                   0.8f, 0.6f, 0.2f, 1.0f, 0.0f, 1.0f,
+                                                   0.8f, 0.6f, 0.2f, 1.0f, 1.0f, 0.0f,
                                                    -0.2f, 0.6f, 0.2f, 1.0f, 0.0f, 1.0f};
             
             #endregion
 
             #region triangleVertices
 
-            float[] triangleVertices = new float[] { -0.8f, 0.8f, 0.4f, 0.0f, 1.0f, 1.0f,
-                                                     -0.6f, -0.4f, 0.4f, 0.0f, 1.0f, 1.0f,
-                                                     0.2f, 0.2f, 0.4f, 0.0f, 1.0f, 1.0f};
+            float[] triangleVertices = new float[] { -0.8f, 0.8f, 0.4f, 1.0f, 0.0f, 0.0f,
+                                                     -0.6f, -0.4f, 0.4f, 0.0f, 1.0f, 0.0f,
+                                                     0.2f, 0.2f, 0.4f, 0.0f, 0.0f, 1.0f};
             
             #endregion
 
