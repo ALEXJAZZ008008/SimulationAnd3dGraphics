@@ -113,16 +113,33 @@ namespace Labs.Lab3
         protected override void OnKeyPress(KeyPressEventArgs e)
         {
             base.OnKeyPress(e);
-            if (e.KeyChar == 'w') {
+
+            if (e.KeyChar == 'w')
+            {
                 mView = mView * Matrix4.CreateTranslation(0.0f, 0.0f, 0.05f);
                 int uView = GL.GetUniformLocation(mShader.ShaderProgramID, "uView");
                 GL.UniformMatrix4(uView, true, ref mView);
             }
+
             if (e.KeyChar == 'a')
             {
                 mView = mView * Matrix4.CreateRotationY(-0.025f);
                 int uView = GL.GetUniformLocation(mShader.ShaderProgramID, "uView");
                 GL.UniformMatrix4(uView, true, ref mView);            
+            }
+
+            if (e.KeyChar == 's')
+            {
+                mView = mView * Matrix4.CreateTranslation(0.0f, 0.0f, -0.05f);
+                int uView = GL.GetUniformLocation(mShader.ShaderProgramID, "uView");
+                GL.UniformMatrix4(uView, true, ref mView);
+            }
+
+            if (e.KeyChar == 'd')
+            {
+                mView = mView * Matrix4.CreateRotationY(0.025f);
+                int uView = GL.GetUniformLocation(mShader.ShaderProgramID, "uView");
+                GL.UniformMatrix4(uView, true, ref mView);
             }
         }
 
