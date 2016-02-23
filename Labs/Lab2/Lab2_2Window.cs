@@ -27,6 +27,25 @@ namespace Labs.Lab2
         private int mVAO_ID;
         private ShaderUtility mShader;
         private ModelUtility mModel;
+        private Matrix4 mView;
+
+        protected override void OnKeyPress(KeyPressEventArgs e)
+        {
+            base.OnKeyPress(e);
+            if (e.KeyChar == 'a')
+            {
+                mView = mView * Matrix4.CreateTranslation(0.01f, 0, 0);
+                int uView = GL.GetUniformLocation(mShader.ShaderProgramID, "uView");
+                GL.UniformMatrix4(uView, true, ref mView);
+            }
+
+            if (e.KeyChar == 'd')
+            {
+                mView = mView * Matrix4.CreateTranslation(-0.01f, 0, 0);
+                int uView = GL.GetUniformLocation(mShader.ShaderProgramID, "uView");
+                GL.UniformMatrix4(uView, true, ref mView);
+            }
+        }
 
         protected override void OnLoad(EventArgs e)
         {
@@ -69,6 +88,10 @@ namespace Labs.Lab2
             GL.VertexAttribPointer(vColourLocation, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 3 * sizeof(float));
 
             GL.BindVertexArray(0);
+
+            mView = Matrix4.Identity;
+            int uView = GL.GetUniformLocation(mShader.ShaderProgramID, "uView");
+            GL.UniformMatrix4(uView, true, ref mView);
 
             base.OnLoad(e);
             
