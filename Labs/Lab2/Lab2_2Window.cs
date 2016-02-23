@@ -35,15 +35,39 @@ namespace Labs.Lab2
 
             float cameraSpeed = 0.01f;
 
+            if (e.KeyChar == 'w')
+            {
+                mView = mView * Matrix4.CreateRotationX(-cameraSpeed);
+                MoveCamera();
+            }
+
             if (e.KeyChar == 'a')
             {
-                mView = mView * Matrix4.CreateTranslation(cameraSpeed, 0, 0);
+                mView = mView * Matrix4.CreateRotationY(-cameraSpeed);
+                MoveCamera();
+            }
+
+            if (e.KeyChar == 's')
+            {
+                mView = mView * Matrix4.CreateRotationX(cameraSpeed);
                 MoveCamera();
             }
 
             if (e.KeyChar == 'd')
             {
-                mView = mView * Matrix4.CreateTranslation(-cameraSpeed, 0, 0);
+                mView = mView * Matrix4.CreateRotationY(cameraSpeed);
+                MoveCamera();
+            }
+
+            if (e.KeyChar == 'q')
+            {
+                mView = mView * Matrix4.CreateTranslation(0, 0, cameraSpeed * 10);
+                MoveCamera();
+            }
+
+            if (e.KeyChar == 'e')
+            {
+                mView = mView * Matrix4.CreateTranslation(0, 0, -cameraSpeed * 10);
                 MoveCamera();
             }
         }
