@@ -106,6 +106,12 @@ namespace Labs.Lab2
                 mView = mView * Matrix4.CreateTranslation(-cameraSpeed, 0, 0);
                 MoveCamera();
             }
+
+            if (e.KeyChar == '0')
+            {
+                mView = mView * Matrix4.CreateRotationX(-cameraSpeed) * Matrix4.CreateTranslation(0, cameraSpeed, 0);
+                MoveCamera();
+            }
         }
 
         private void MoveCamera()

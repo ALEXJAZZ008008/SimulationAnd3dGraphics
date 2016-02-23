@@ -43,17 +43,22 @@ namespace Labs.Lab3
             GL.GenVertexArrays(mVAO_IDs.Length, mVAO_IDs);
             GL.GenBuffers(mVBO_IDs.Length, mVBO_IDs);
 
-            float[] vertices = new float[] {-10, 0, -10,0,1,0,
-                                             -10, 0, 10,0,1,0,
-                                             10, 0, 10,0,1,0,
-                                             10, 0, -10,0,1,0,};
+            float[] vertices = new float[] {-10, 0, -10, 0, 1, 0,
+                                             -10, 0, 10, 0, 1, 0,
+                                             10, 0, 10, 0, 1, 0,
+                                             10, 0, -10, 0, 1, 0,};
 
             GL.BindVertexArray(mVAO_IDs[0]);
             GL.BindBuffer(BufferTarget.ArrayBuffer, mVBO_IDs[0]);
             GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(vertices.Length * sizeof(float)), vertices, BufferUsageHint.StaticDraw);
 
+            int vNormalLocation = GL.GetAttribLocation(mShader.ShaderProgramID, "vNormal");
+            GL.EnableVertexAttribArray(vNormalLocation);
+            GL.VertexAttribPointer(vNormalLocation, mVBO_IDs.Length, VertexAttribPointerType.Float, true, 6 * sizeof(float), 3 * sizeof(float));
+
             int size;
             GL.GetBufferParameter(BufferTarget.ArrayBuffer, BufferParameterName.BufferSize, out size);
+            
             if (vertices.Length * sizeof(float) != size)
             {
                 throw new ApplicationException("Vertex data not loaded onto graphics card correctly");
@@ -66,17 +71,23 @@ namespace Labs.Lab3
 
             GL.BindVertexArray(mVAO_IDs[1]);
             GL.BindBuffer(BufferTarget.ArrayBuffer, mVBO_IDs[1]);
-            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(mSphereModelUtility.Vertices.Length * sizeof(float)), mSphereModelUtility.Vertices, BufferUsageHint.StaticDraw);           
+            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(mSphereModelUtility.Vertices.Length * sizeof(float)), mSphereModelUtility.Vertices, BufferUsageHint.StaticDraw);
+
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, mVBO_IDs[2]);
             GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(mSphereModelUtility.Indices.Length * sizeof(float)), mSphereModelUtility.Indices, BufferUsageHint.StaticDraw);
 
+            GL.EnableVertexAttribArray(vNormalLocation);
+            GL.VertexAttribPointer(vNormalLocation, mVBO_IDs.Length, VertexAttribPointerType.Float, true, 6 * sizeof(float), 3 * sizeof(float));
+
             GL.GetBufferParameter(BufferTarget.ArrayBuffer, BufferParameterName.BufferSize, out size);
+            
             if (mSphereModelUtility.Vertices.Length * sizeof(float) != size)
             {
                 throw new ApplicationException("Vertex data not loaded onto graphics card correctly");
             }
 
             GL.GetBufferParameter(BufferTarget.ElementArrayBuffer, BufferParameterName.BufferSize, out size);
+            
             if (mSphereModelUtility.Indices.Length * sizeof(float) != size)
             {
                 throw new ApplicationException("Index data not loaded onto graphics card correctly");
@@ -92,7 +103,7 @@ namespace Labs.Lab3
             GL.UniformMatrix4(uView, true, ref mView);
 
             mGroundModel = Matrix4.CreateTranslation(0, 0, -5f);
-            mSphereModel = Matrix4.CreateTranslation(0, 1, -5f);        
+            mSphereModel = Matrix4.CreateTranslation(0, 1, -5f);
 
             base.OnLoad(e);
             
@@ -101,7 +112,9 @@ namespace Labs.Lab3
         protected override void OnResize(EventArgs e)
         {
             base.OnResize(e);
+
             GL.Viewport(this.ClientRectangle);
+
             if (mShader != null)
             {
                 int uProjectionLocation = GL.GetUniformLocation(mShader.ShaderProgramID, "uProjection");
