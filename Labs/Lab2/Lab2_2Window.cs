@@ -32,19 +32,26 @@ namespace Labs.Lab2
         protected override void OnKeyPress(KeyPressEventArgs e)
         {
             base.OnKeyPress(e);
+
+            float cameraSpeed = 0.01f;
+
             if (e.KeyChar == 'a')
             {
-                mView = mView * Matrix4.CreateTranslation(0.01f, 0, 0);
-                int uView = GL.GetUniformLocation(mShader.ShaderProgramID, "uView");
-                GL.UniformMatrix4(uView, true, ref mView);
+                mView = mView * Matrix4.CreateTranslation(cameraSpeed, 0, 0);
+                MoveCamera();
             }
 
             if (e.KeyChar == 'd')
             {
-                mView = mView * Matrix4.CreateTranslation(-0.01f, 0, 0);
-                int uView = GL.GetUniformLocation(mShader.ShaderProgramID, "uView");
-                GL.UniformMatrix4(uView, true, ref mView);
+                mView = mView * Matrix4.CreateTranslation(-cameraSpeed, 0, 0);
+                MoveCamera();
             }
+        }
+
+        private void MoveCamera()
+        {
+            int uView = GL.GetUniformLocation(mShader.ShaderProgramID, "uView");
+            GL.UniformMatrix4(uView, true, ref mView);
         }
 
         protected override void OnLoad(EventArgs e)
