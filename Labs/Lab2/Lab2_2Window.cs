@@ -86,6 +86,11 @@ namespace Labs.Lab2
             GL.UniformMatrix4(uModelLocation, true, ref m1);
 
             GL.DrawElements(BeginMode.Triangles, mModel.Indices.Length, DrawElementsType.UnsignedInt, 0);
+
+            Matrix4 m2 = Matrix4.CreateTranslation(-0.5f, 0.5f, 0);
+            GL.UniformMatrix4(uModelLocation, true, ref m2);
+
+            GL.DrawElements(BeginMode.Triangles, mModel.Indices.Length, DrawElementsType.UnsignedInt, 0);
             
             GL.BindVertexArray(0);
             this.SwapBuffers();
