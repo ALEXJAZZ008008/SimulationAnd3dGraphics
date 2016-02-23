@@ -54,6 +54,12 @@ namespace Labs.Lab2
             GL.UniformMatrix4(uView, true, ref mView);
         }
 
+        protected override void OnResize(EventArgs e)
+        {
+            base.OnResize(e);
+            GL.Viewport(this.ClientRectangle);
+        }
+
         protected override void OnLoad(EventArgs e)
         {
             // Set some GL state
