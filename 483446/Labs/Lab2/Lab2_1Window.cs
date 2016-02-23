@@ -30,22 +30,22 @@ namespace Labs.Lab2
         protected override void OnLoad(EventArgs e)
         {
             GL.ClearColor(Color4.CadetBlue);
+            GL.Enable(EnableCap.DepthTest);
 
             #region squareVertices
 
-            float[] squareVertices = new float[] { -0.2f, -0.4f, 0.2f, 0.0f, 1.0f, 1.0f,
-                                                   0.8f, -0.4f, 0.2f, 0.0f, 1.0f, 1.0f,
-                                                   0.8f, 0.6f, 0.2f, 0.0f, 1.0f, 1.0f,
-                                                   -0.2f, 0.6f, 0.2f, 0.0f, 1.0f, 1.0f};
-
+            float[] squareVertices = new float[] { -0.2f, -0.4f, 0.2f, 1.0f, 0.0f, 1.0f,
+                                                   0.8f, -0.4f, 0.2f, 1.0f, 0.0f, 1.0f,
+                                                   0.8f, 0.6f, 0.2f, 1.0f, 0.0f, 1.0f,
+                                                   -0.2f, 0.6f, 0.2f, 1.0f, 0.0f, 1.0f};
             
             #endregion
 
             #region triangleVertices
 
-            float[] triangleVertices = new float[] { -0.8f, 0.8f, 0.4f, 1.0f, 0.0f, 1.0f,
-                                                     -0.6f, -0.4f, 0.4f, 1.0f, 0.0f, 1.0f,
-                                                     0.2f, 0.2f, 0.4f, 1.0f, 0.0f, 1.0f};
+            float[] triangleVertices = new float[] { -0.8f, 0.8f, 0.4f, 0.0f, 1.0f, 1.0f,
+                                                     -0.6f, -0.4f, 0.4f, 0.0f, 1.0f, 1.0f,
+                                                     0.2f, 0.2f, 0.4f, 0.0f, 1.0f, 1.0f};
             
             #endregion
 
@@ -77,20 +77,6 @@ namespace Labs.Lab2
             
             #endregion
 
-            #region squareIndices BindBuffer
-
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, mSquareVertexBufferObjectIDArray[1]);
-            GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(squareIndices.Length * sizeof(int)), squareIndices, BufferUsageHint.StaticDraw);
-
-            GL.GetBufferParameter(BufferTarget.ElementArrayBuffer, BufferParameterName.BufferSize, out squareSize);
-
-            if (squareIndices.Length * sizeof(int) != squareSize)
-            {
-                throw new ApplicationException("Index data not loaded onto graphics card correctly");
-            }
-
-            #endregion
-
             #region triangleVertices BindBuffer
 
             GL.GenBuffers(2, mTriangleVertexBufferObjectIDArray);
@@ -107,7 +93,7 @@ namespace Labs.Lab2
             
             #endregion
 
-            #region triangleIndices BindBuffer
+            #region squareIndices BindBuffer
 
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, mTriangleVertexBufferObjectIDArray[1]);
             GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(triangleIndices.Length * sizeof(int)), triangleIndices, BufferUsageHint.StaticDraw);
@@ -122,16 +108,25 @@ namespace Labs.Lab2
             
             #endregion
 
+            #region triangleIndices BindBuffer
+
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, mSquareVertexBufferObjectIDArray[1]);
+            GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(squareIndices.Length * sizeof(int)), squareIndices, BufferUsageHint.StaticDraw);
+
+            GL.GetBufferParameter(BufferTarget.ElementArrayBuffer, BufferParameterName.BufferSize, out squareSize);
+
+            if (squareIndices.Length * sizeof(int) != squareSize)
+            {
+                throw new ApplicationException("Index data not loaded onto graphics card correctly");
+            }
+            
+            #endregion
+
             #region Shader Loading Code
 
             mShader = new ShaderUtility(@"Lab2/Shaders/vLab21.vert", @"Lab2/Shaders/fSimple.frag");
 
             #endregion
-
-            int vColourLocation = GL.GetAttribLocation(mShader.ShaderProgramID, "vColour");
-            GL.EnableVertexAttribArray(vColourLocation);
-
-            GL.Enable(EnableCap.DepthTest);
 
             base.OnLoad(e);
         }
@@ -149,12 +144,15 @@ namespace Labs.Lab2
             
             #region Shader Loading Code
             
+            GL.UseProgram(mShader.ShaderProgramID);
+
             int vPositionLocation = GL.GetAttribLocation(mShader.ShaderProgramID, "vPosition");
-            int vColourLocation = GL.GetAttribLocation(mShader.ShaderProgramID, "vColour");
-
+            GL.EnableVertexAttribArray(vPositionLocation);
             GL.VertexAttribPointer(vPositionLocation, 3, VertexAttribPointerType.Float, false, 6 *sizeof(float), 0);
-            GL.VertexAttribPointer(vColourLocation, 3, VertexAttribPointerType.Float, false, 6 *sizeof(float), 3 * sizeof(float));
 
+            int vColourLocation = GL.GetAttribLocation(mShader.ShaderProgramID, "vColour");
+            GL.EnableVertexAttribArray(vColourLocation);
+            GL.VertexAttribPointer(vColourLocation, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 3 * sizeof(float));
             #endregion
 
             GL.DrawElements(PrimitiveType.TriangleFan, 4, DrawElementsType.UnsignedInt, 0);
@@ -183,7 +181,6 @@ namespace Labs.Lab2
         protected override void OnUnload(EventArgs e)
         {
             base.OnUnload(e);
-            GL.DeleteBuffers(2, mSquareVertexBufferObjectIDArray);
             GL.DeleteBuffers(2, mTriangleVertexBufferObjectIDArray);
             GL.UseProgram(0);
             mShader.Delete();
