@@ -10,6 +10,7 @@ namespace Labs.Lab2
     {        
         private int[] mTriangleVertexBufferObjectIDArray = new int[2];
         private int[] mSquareVertexBufferObjectIDArray = new int[2];
+        private int[] mVertexArrayObjectIDs = new int[2];
         private ShaderUtility mShader;
 
         public Lab2_1Window()
@@ -126,6 +127,42 @@ namespace Labs.Lab2
 
             mShader = new ShaderUtility(@"Lab2/Shaders/vLab21.vert", @"Lab2/Shaders/fSimple.frag");
 
+            GL.GenVertexArrays(2, mVertexArrayObjectIDs);
+
+            #region Square Shader Loading Code
+
+            GL.BindVertexArray(mVertexArrayObjectIDs[0]);
+
+            GL.BindBuffer(BufferTarget.ArrayBuffer, mSquareVertexBufferObjectIDArray[0]);
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, mSquareVertexBufferObjectIDArray[1]);
+
+            GL.UseProgram(mShader.ShaderProgramID);
+
+            int vPositionLocation = GL.GetAttribLocation(mShader.ShaderProgramID, "vPosition");
+            GL.EnableVertexAttribArray(vPositionLocation);
+            GL.VertexAttribPointer(vPositionLocation, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 0);
+
+            int vColourLocation = GL.GetAttribLocation(mShader.ShaderProgramID, "vColour");
+            GL.EnableVertexAttribArray(vColourLocation);
+            GL.VertexAttribPointer(vColourLocation, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 3 * sizeof(float));
+
+            #endregion
+
+            #region Triangle Shader Loading Code
+
+            GL.BindVertexArray(mVertexArrayObjectIDs[1]);
+
+            GL.BindBuffer(BufferTarget.ArrayBuffer, mTriangleVertexBufferObjectIDArray[0]);
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, mTriangleVertexBufferObjectIDArray[1]);
+
+            GL.EnableVertexAttribArray(vPositionLocation);
+            GL.VertexAttribPointer(vPositionLocation, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 0);
+
+            GL.EnableVertexAttribArray(vColourLocation);
+            GL.VertexAttribPointer(vColourLocation, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 3 * sizeof(float));
+
+            #endregion
+
             #endregion
 
             base.OnLoad(e);
@@ -139,41 +176,20 @@ namespace Labs.Lab2
 
             #region Square Drawing Code
 
-            GL.BindBuffer(BufferTarget.ArrayBuffer, mSquareVertexBufferObjectIDArray[0]);
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, mSquareVertexBufferObjectIDArray[1]);
-            
-            #region Shader Loading Code
-            
-            GL.UseProgram(mShader.ShaderProgramID);
-
-            int vPositionLocation = GL.GetAttribLocation(mShader.ShaderProgramID, "vPosition");
-            GL.EnableVertexAttribArray(vPositionLocation);
-            GL.VertexAttribPointer(vPositionLocation, 3, VertexAttribPointerType.Float, false, 6 *sizeof(float), 0);
-
-            int vColourLocation = GL.GetAttribLocation(mShader.ShaderProgramID, "vColour");
-            GL.EnableVertexAttribArray(vColourLocation);
-            GL.VertexAttribPointer(vColourLocation, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 3 * sizeof(float));
-            #endregion
+            GL.BindVertexArray(mVertexArrayObjectIDs[0]);
 
             GL.DrawElements(PrimitiveType.TriangleFan, 4, DrawElementsType.UnsignedInt, 0);
-            
+
             #endregion
 
             #region Triangle Drawing Code
 
-            GL.BindBuffer(BufferTarget.ArrayBuffer, mTriangleVertexBufferObjectIDArray[0]);
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, mTriangleVertexBufferObjectIDArray[1]);
-
-            #region Shader Loading Code
-
-            GL.VertexAttribPointer(vPositionLocation, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 0);
-            GL.VertexAttribPointer(vColourLocation, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 3 * sizeof(float));
-
-            #endregion
-
+            GL.BindVertexArray(mVertexArrayObjectIDs[1]);
             GL.DrawElements(PrimitiveType.Triangles, 3, DrawElementsType.UnsignedInt, 0);
-            
+
             #endregion
+
+            GL.BindVertexArray(0);
 
             this.SwapBuffers();
         }
@@ -181,7 +197,13 @@ namespace Labs.Lab2
         protected override void OnUnload(EventArgs e)
         {
             base.OnUnload(e);
+
+            GL.DeleteBuffers(2, mSquareVertexBufferObjectIDArray);
             GL.DeleteBuffers(2, mTriangleVertexBufferObjectIDArray);
+
+            GL.BindVertexArray(0);
+            GL.DeleteVertexArrays(2, mVertexArrayObjectIDs);
+
             GL.UseProgram(0);
             mShader.Delete();
         }
