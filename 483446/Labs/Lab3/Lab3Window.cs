@@ -39,6 +39,9 @@ namespace Labs.Lab3
             mShader = new ShaderUtility(@"Lab3/Shaders/vLighting.vert", @"Lab3/Shaders/fPassThrough.frag");
             GL.UseProgram(mShader.ShaderProgramID);
             int vPositionLocation = GL.GetAttribLocation(mShader.ShaderProgramID, "vPosition");
+            int vNormalLocation = GL.GetAttribLocation(mShader.ShaderProgramID, "vNormal");
+            int uView = GL.GetUniformLocation(mShader.ShaderProgramID, "uView");
+            int uLightDirectionLocation = GL.GetUniformLocation(mShader.ShaderProgramID,"uLightDirection");
 
             GL.GenVertexArrays(mVAO_IDs.Length, mVAO_IDs);
             GL.GenBuffers(mVBO_IDs.Length, mVBO_IDs);
@@ -52,7 +55,6 @@ namespace Labs.Lab3
             GL.BindBuffer(BufferTarget.ArrayBuffer, mVBO_IDs[0]);
             GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(vertices.Length * sizeof(float)), vertices, BufferUsageHint.StaticDraw);
 
-            int vNormalLocation = GL.GetAttribLocation(mShader.ShaderProgramID, "vNormal");
             GL.EnableVertexAttribArray(vNormalLocation);
             GL.VertexAttribPointer(vNormalLocation, mVBO_IDs.Length, VertexAttribPointerType.Float, true, 6 * sizeof(float), 3 * sizeof(float));
 
@@ -99,11 +101,14 @@ namespace Labs.Lab3
             GL.BindVertexArray(0);
 
             mView = Matrix4.CreateTranslation(0, -1.5f, 0);
-            int uView = GL.GetUniformLocation(mShader.ShaderProgramID, "uView");
             GL.UniformMatrix4(uView, true, ref mView);
 
             mGroundModel = Matrix4.CreateTranslation(0, 0, -5f);
             mSphereModel = Matrix4.CreateTranslation(0, 1, -5f);
+
+            Vector3 normalisedLightDirection, lightDirection = new Vector3(-1, -1, -1);
+            Vector3.Normalize(ref lightDirection, out normalisedLightDirection);
+            GL.Uniform3(uLightDirectionLocation, normalisedLightDirection);
 
             base.OnLoad(e);
             
