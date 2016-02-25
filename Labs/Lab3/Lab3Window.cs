@@ -45,8 +45,11 @@ namespace Labs.Lab3
             int vPositionLocation = GL.GetAttribLocation(mShader.ShaderProgramID, "vPosition");
             int vNormalLocation = GL.GetAttribLocation(mShader.ShaderProgramID, "vNormal");
             int uView = GL.GetUniformLocation(mShader.ShaderProgramID, "uView");
-            int uLightPositionLocation = GL.GetUniformLocation(mShader.ShaderProgramID,"uLightPosition");
-            int uEyePosition = GL.GetUniformLocation(mShader.ShaderProgramID, "uEyePosition");
+            int uEyePositionLocation = GL.GetUniformLocation(mShader.ShaderProgramID, "uEyePosition");
+            int uLightPositionLocation = GL.GetUniformLocation(mShader.ShaderProgramID,"uLight.Position");
+            int uAmbientLightLocation = GL.GetUniformLocation(mShader.ShaderProgramID,"uLight.AmbientLight");
+            int uDiffuseLightLocation = GL.GetUniformLocation(mShader.ShaderProgramID, "uLight.DiffuseLight");
+            int uSpecularLightLocation = GL.GetUniformLocation(mShader.ShaderProgramID, "uLight.SpecularLight");
 
             GL.GenVertexArrays(mVAO_IDs.Length, mVAO_IDs);
             GL.GenBuffers(mVBO_IDs.Length, mVBO_IDs);
@@ -147,11 +150,16 @@ namespace Labs.Lab3
             mModelModel = Matrix4.CreateTranslation(0, 1, -5f);
             mCylinderModel = Matrix4.CreateTranslation(0, 0, -5f);
 
-            Vector4 lightPosition = Vector4.Transform(new Vector4(2, 1, -8.5f, 1), mView);
+            Vector4 eyePosition = Vector4.Transform(new Vector4(0, 0, 0, 1), mView);
+            GL.Uniform4(uEyePositionLocation, eyePosition);
+
+            Vector4 lightPosition = Vector4.Transform(new Vector4(2, 4, -8.5f, 1), mView);
             GL.Uniform4(uLightPositionLocation, lightPosition);
 
-            Vector4 eyePosition = Vector4.Transform(new Vector4(0, 0, 0, 1), mView);
-            GL.Uniform4(uEyePosition, eyePosition);
+            Vector3 colour = new Vector3(1.0f, 1.0f, 1.0f);
+            GL.Uniform3(uAmbientLightLocation, colour);
+            GL.Uniform3(uDiffuseLightLocation, colour);
+            GL.Uniform3(uSpecularLightLocation, colour);
 
             base.OnLoad(e);
         }
@@ -243,14 +251,43 @@ namespace Labs.Lab3
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             int uModel = GL.GetUniformLocation(mShader.ShaderProgramID, "uModel");
-            GL.UniformMatrix4(uModel, true, ref mGroundModel);  
+            int uAmbientReflectivityLocation = GL.GetUniformLocation(mShader.ShaderProgramID, "uMaterial.AmbientReflectivity");
+            int uDiffuseReflectivityLocation = GL.GetUniformLocation(mShader.ShaderProgramID, "uMaterial.DiffuseReflectivity");
+            int uSpecularReflectivityLocation = GL.GetUniformLocation(mShader.ShaderProgramID, "uMaterial.SpecularReflectivity");
+            int uShininessLocation = GL.GetUniformLocation(mShader.ShaderProgramID, "uMaterial.Shininess");
+
+            GL.UniformMatrix4(uModel, true, ref mGroundModel);
+
+            Vector3 groundAmbientReflectivity = new Vector3(0.02f, 0.02f, 0.02f);
+            GL.Uniform3(uAmbientReflectivityLocation, groundAmbientReflectivity);
+
+            Vector3 groundDiffuseReflectivity = new Vector3(0.01f, 0.01f, 0.01f);
+            GL.Uniform3(uDiffuseReflectivityLocation, groundDiffuseReflectivity);
+
+            Vector3 groundSpecularReflectivity = new Vector3(0.4f, 0.4f, 0.4f);
+            GL.Uniform3(uSpecularReflectivityLocation, groundSpecularReflectivity);
+
+            float groundShininess = 10f;
+            GL.Uniform1(uShininessLocation, groundShininess);
 
             GL.BindVertexArray(mVAO_IDs[0]);
             GL.DrawArrays(PrimitiveType.TriangleFan, 0, 4);
 
             Matrix4 m1 = mModelModel * mGroundModel;
             uModel = GL.GetUniformLocation(mShader.ShaderProgramID, "uModel");
-            GL.UniformMatrix4(uModel, true, ref m1); 
+            GL.UniformMatrix4(uModel, true, ref m1);
+
+            Vector3 modelAmbientReflectivity = new Vector3(0.2125f, 0.1275f, 0.054f);
+            GL.Uniform3(uAmbientReflectivityLocation, modelAmbientReflectivity);
+
+            Vector3 modelDiffuseReflectivity = new Vector3(0.714f, 0.4284f, 0.18144f);
+            GL.Uniform3(uDiffuseReflectivityLocation, modelDiffuseReflectivity);
+
+            Vector3 modelSpecularReflectivity = new Vector3(0.393548f, 0.271906f, 0.166721f);
+            GL.Uniform3(uSpecularReflectivityLocation, modelSpecularReflectivity);
+
+            float modelShininess = 76.8f;
+            GL.Uniform1(uShininessLocation, modelShininess);
 
             GL.BindVertexArray(mVAO_IDs[1]);
             GL.DrawElements(PrimitiveType.Triangles, mModelModelUtility.Indices.Length, DrawElementsType.UnsignedInt, 0);
@@ -258,6 +295,18 @@ namespace Labs.Lab3
             Matrix4 m2 = mCylinderModel * mGroundModel;
             uModel = GL.GetUniformLocation(mShader.ShaderProgramID, "uModel");
             GL.UniformMatrix4(uModel, true, ref m2);
+
+            Vector3 cylinderAmbientReflectivity = new Vector3(0.05375f, 0.05f, 0.06625f);
+            GL.Uniform3(uAmbientReflectivityLocation, cylinderAmbientReflectivity);
+
+            Vector3 cylinderDiffuseReflectivity = new Vector3(0.18275f, 0.17f, 0.22525f);
+            GL.Uniform3(uDiffuseReflectivityLocation, cylinderDiffuseReflectivity);
+
+            Vector3 cylinderSpecularReflectivity = new Vector3(0.332741f, 0.328634f, 0.346435f);
+            GL.Uniform3(uSpecularReflectivityLocation, cylinderSpecularReflectivity);
+
+            float cylinderShininess = 38.4f;
+            GL.Uniform1(uShininessLocation, cylinderShininess);
 
             GL.BindVertexArray(mVAO_IDs[2]);
             GL.DrawElements(PrimitiveType.Triangles, mCylinderModelUtility.Indices.Length, DrawElementsType.UnsignedInt, 0);
