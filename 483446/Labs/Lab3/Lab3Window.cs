@@ -21,6 +21,7 @@ namespace Labs.Lab3
                 GraphicsContextFlags.ForwardCompatible
                 )
         {
+
         }
 
         private int[] mVBO_IDs = new int[5];
@@ -104,7 +105,7 @@ namespace Labs.Lab3
 
             GL.EnableVertexAttribArray(vPositionLocation);
             GL.VertexAttribPointer(vPositionLocation, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 0);
-
+            
             mCylinderModelUtility = ModelUtility.LoadModel(@"Utility/Models/cylinder.bin");
 
             GL.BindVertexArray(mVAO_IDs[2]);
@@ -137,7 +138,7 @@ namespace Labs.Lab3
 
             GL.EnableVertexAttribArray(vPositionLocation);
             GL.VertexAttribPointer(vPositionLocation, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 0);
-
+            
             GL.BindVertexArray(0);
 
             mView = Matrix4.CreateTranslation(0, -1.5f, 0);
@@ -145,7 +146,7 @@ namespace Labs.Lab3
 
             mGroundModel = Matrix4.CreateTranslation(0, 0, -5f);
             mAngelModel = Matrix4.CreateTranslation(0, 1, -5f);
-            mCylinderModel = Matrix4.CreateTranslation(0, 2, -5f);
+            mCylinderModel = Matrix4.CreateTranslation(0, -1, -5f);
 
             Vector4 lightPosition = Vector4.Transform(new Vector4(2, 1, -8.5f, 1), mView);
             GL.Uniform4(uLightPositionLocation, lightPosition);
@@ -249,7 +250,7 @@ namespace Labs.Lab3
 
             GL.BindVertexArray(mVAO_IDs[1]);
             GL.DrawElements(PrimitiveType.Triangles, mAngelModelUtility.Indices.Length, DrawElementsType.UnsignedInt, 0);
-
+            
             Matrix4 m2 = mCylinderModel * mGroundModel;
             uModel = GL.GetUniformLocation(mShader.ShaderProgramID, "uModel");
             GL.UniformMatrix4(uModel, true, ref m2);
@@ -258,6 +259,7 @@ namespace Labs.Lab3
             GL.DrawElements(PrimitiveType.Triangles, mCylinderModelUtility.Indices.Length, DrawElementsType.UnsignedInt, 0);
             
             GL.BindVertexArray(0);
+
             this.SwapBuffers();
         }
 
@@ -265,10 +267,14 @@ namespace Labs.Lab3
         {
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
+
             GL.BindVertexArray(0);
+
             GL.DeleteBuffers(mVBO_IDs.Length, mVBO_IDs);
             GL.DeleteVertexArrays(mVAO_IDs.Length, mVAO_IDs);
+
             mShader.Delete();
+
             base.OnUnload(e);
         }
     }
