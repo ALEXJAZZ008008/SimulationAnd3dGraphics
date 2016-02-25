@@ -61,7 +61,7 @@ namespace Labs.Lab3
             GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(vertices.Length * sizeof(float)), vertices, BufferUsageHint.StaticDraw);
 
             GL.EnableVertexAttribArray(vNormalLocation);
-            GL.VertexAttribPointer(vNormalLocation, mVBO_IDs.Length, VertexAttribPointerType.Float, true, 6 * sizeof(float), 3 * sizeof(float));
+            GL.VertexAttribPointer(vNormalLocation, 3, VertexAttribPointerType.Float, true, 6 * sizeof(float), 3 * sizeof(float));
 
             GL.GetBufferParameter(BufferTarget.ArrayBuffer, BufferParameterName.BufferSize, out size);
             
@@ -80,14 +80,11 @@ namespace Labs.Lab3
             GL.BindBuffer(BufferTarget.ArrayBuffer, mVBO_IDs[1]);
             GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(mAngelModelUtility.Vertices.Length * sizeof(float)), mAngelModelUtility.Vertices, BufferUsageHint.StaticDraw);
 
-            GL.EnableVertexAttribArray(vNormalLocation);
-            GL.VertexAttribPointer(vNormalLocation, mVBO_IDs.Length, VertexAttribPointerType.Float, true, 6 * sizeof(float), 3 * sizeof(float));
-
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, mVBO_IDs[2]);
             GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(mAngelModelUtility.Indices.Length * sizeof(float)), mAngelModelUtility.Indices, BufferUsageHint.StaticDraw);
 
             GL.EnableVertexAttribArray(vNormalLocation);
-            GL.VertexAttribPointer(vNormalLocation, mVBO_IDs.Length, VertexAttribPointerType.Float, true, 6 * sizeof(float), 3 * sizeof(float));
+            GL.VertexAttribPointer(vNormalLocation, 3, VertexAttribPointerType.Float, true, 6 * sizeof(float), 3 * sizeof(float));
 
             GL.GetBufferParameter(BufferTarget.ArrayBuffer, BufferParameterName.BufferSize, out size);
             
@@ -113,14 +110,11 @@ namespace Labs.Lab3
             GL.BindBuffer(BufferTarget.ArrayBuffer, mVBO_IDs[3]);
             GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(mCylinderModelUtility.Vertices.Length * sizeof(float)), mCylinderModelUtility.Vertices, BufferUsageHint.StaticDraw);
 
-            GL.EnableVertexAttribArray(vNormalLocation);
-            GL.VertexAttribPointer(vNormalLocation, mVBO_IDs.Length, VertexAttribPointerType.Float, true, 6 * sizeof(float), 3 * sizeof(float));
-
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, mVBO_IDs[4]);
             GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(mCylinderModelUtility.Indices.Length * sizeof(float)), mCylinderModelUtility.Indices, BufferUsageHint.StaticDraw);
 
             GL.EnableVertexAttribArray(vNormalLocation);
-            GL.VertexAttribPointer(vNormalLocation, mVBO_IDs.Length, VertexAttribPointerType.Float, true, 6 * sizeof(float), 3 * sizeof(float));
+            GL.VertexAttribPointer(vNormalLocation, 3, VertexAttribPointerType.Float, true, 6 * sizeof(float), 3 * sizeof(float));
 
             GL.GetBufferParameter(BufferTarget.ArrayBuffer, BufferParameterName.BufferSize, out size);
 
@@ -146,7 +140,7 @@ namespace Labs.Lab3
 
             mGroundModel = Matrix4.CreateTranslation(0, 0, -5f);
             mAngelModel = Matrix4.CreateTranslation(0, 1, -5f);
-            mCylinderModel = Matrix4.CreateTranslation(0, -1, -5f);
+            mCylinderModel = Matrix4.CreateTranslation(0, 0, -5f);
 
             Vector4 lightPosition = Vector4.Transform(new Vector4(2, 1, -8.5f, 1), mView);
             GL.Uniform4(uLightPositionLocation, lightPosition);
@@ -222,6 +216,7 @@ namespace Labs.Lab3
                 Matrix4 translation = Matrix4.CreateTranslation(t);
                 Matrix4 inverseTranslation = Matrix4.CreateTranslation(-t);
                 mAngelModel = mAngelModel * inverseTranslation * Matrix4.CreateRotationY(-0.025f) * translation;
+                mCylinderModel = mCylinderModel * inverseTranslation * Matrix4.CreateRotationY(-0.025f) * translation;
             }
 
             if (e.KeyChar == 'v')
@@ -230,6 +225,7 @@ namespace Labs.Lab3
                 Matrix4 translation = Matrix4.CreateTranslation(t);
                 Matrix4 inverseTranslation = Matrix4.CreateTranslation(-t);
                 mAngelModel = mAngelModel * inverseTranslation * Matrix4.CreateRotationY(0.025f) * translation;
+                mCylinderModel = mCylinderModel * inverseTranslation * Matrix4.CreateRotationY(0.025f) * translation;
             }
         }
 
