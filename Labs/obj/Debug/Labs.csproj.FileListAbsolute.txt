@@ -10,7 +10,6 @@
 \\data.adir.hull.ac.uk\home4\483\483446\08214\Labs\bin\Debug\Lab1\Shaders\vSimple.vert
 \\data.adir.hull.ac.uk\home4\483\483446\08214\Labs\bin\Debug\Utility\Models\cylinder.bin
 \\data.adir.hull.ac.uk\home4\483\483446\08214\Labs\bin\Debug\Utility\Models\lab22model.sjg
-\\data.adir.hull.ac.uk\home4\483\483446\08214\Labs\bin\Debug\Utility\Models\model.bin
 \\data.adir.hull.ac.uk\home4\483\483446\08214\Labs\bin\Debug\Utility\Models\sphere.bin
 \\data.adir.hull.ac.uk\home4\483\483446\08214\Labs\bin\Debug\Labs.exe
 \\data.adir.hull.ac.uk\home4\483\483446\08214\Labs\bin\Debug\Labs.pdb
@@ -66,3 +65,6 @@ G:\08214\Labs\bin\Debug\OpenTK.dll
 G:\08214\Labs\obj\Debug\Labs.exe
 G:\08214\Labs\obj\Debug\Labs.pdb
 G:\08214\Labs\obj\Debug\Labs.csprojResolveAssemblyReference.cache
+\\data.adir.hull.ac.uk\home4\483\483446\08214\Labs\bin\Debug\Utility\Models\model1.bin
+\\data.adir.hull.ac.uk\home4\483\483446\08214\Labs\bin\Debug\Utility\Models\model2.bin
+\\data.adir.hull.ac.uk\home4\483\483446\08214\Labs\bin\Debug\Utility\Models\model3.bin
