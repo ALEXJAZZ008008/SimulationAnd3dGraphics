@@ -31,6 +31,8 @@ namespace Labs.Lab3
 
         protected override void OnLoad(EventArgs e)
         {
+            int size;
+
             // Set some GL state
             GL.ClearColor(Color4.White);
             GL.Enable(EnableCap.DepthTest);
@@ -38,10 +40,11 @@ namespace Labs.Lab3
 
             mShader = new ShaderUtility(@"Lab3/Shaders/vLighting.vert", @"Lab3/Shaders/fPassThrough.frag");
             GL.UseProgram(mShader.ShaderProgramID);
+
             int vPositionLocation = GL.GetAttribLocation(mShader.ShaderProgramID, "vPosition");
             int vNormalLocation = GL.GetAttribLocation(mShader.ShaderProgramID, "vNormal");
             int uView = GL.GetUniformLocation(mShader.ShaderProgramID, "uView");
-            int uLightDirectionLocation = GL.GetUniformLocation(mShader.ShaderProgramID,"uLightDirection");
+            int uLightPositionLocation = GL.GetUniformLocation(mShader.ShaderProgramID,"uLightPosition");
 
             GL.GenVertexArrays(mVAO_IDs.Length, mVAO_IDs);
             GL.GenBuffers(mVBO_IDs.Length, mVBO_IDs);
@@ -58,7 +61,6 @@ namespace Labs.Lab3
             GL.EnableVertexAttribArray(vNormalLocation);
             GL.VertexAttribPointer(vNormalLocation, mVBO_IDs.Length, VertexAttribPointerType.Float, true, 6 * sizeof(float), 3 * sizeof(float));
 
-            int size;
             GL.GetBufferParameter(BufferTarget.ArrayBuffer, BufferParameterName.BufferSize, out size);
             
             if (vertices.Length * sizeof(float) != size)
@@ -106,9 +108,8 @@ namespace Labs.Lab3
             mGroundModel = Matrix4.CreateTranslation(0, 0, -5f);
             mSphereModel = Matrix4.CreateTranslation(0, 1, -5f);
 
-            Vector3 normalisedLightDirection, lightDirection = new Vector3(-1, -1, -1);
-            Vector3.Normalize(ref lightDirection, out normalisedLightDirection);
-            GL.Uniform3(uLightDirectionLocation, normalisedLightDirection);
+            Vector3 lightPosition = new Vector3(2, 1, -8.5f);
+            GL.Uniform3(uLightPositionLocation, lightPosition);
 
             base.OnLoad(e);
             
