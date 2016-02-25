@@ -16,5 +16,5 @@ void main()
 	vec4 reflectedVector = reflect(-lightDir, oNormal);
 	float specularFactor = pow(max(dot(reflectedVector, eyeDirection), 0), 25.6f);
 
-	FragColour = vec4(vec3(specularFactor), 1);
+	FragColour = vec4(vec3(0.2125f + diffuseFactor + specularFactor), 1);
 }
