@@ -36,9 +36,9 @@ namespace Labs.Lab1
                                             -0.6f, -0.6f,
                                             -0.8f, 0.4f};
 
-            uint[] indices = new uint[] {0, 4, 3,
-                                         2,
-                                         1
+            uint[] indices = new uint[] {0, 4, 1,
+                                         3,
+                                         2
             };
 
 
@@ -92,7 +92,7 @@ namespace Labs.Lab1
 
             #endregion
 
-            GL.DrawElements(PrimitiveType.TriangleStrip, 5, DrawElementsType.UnsignedInt, 0);
+            GL.DrawElements(PrimitiveType.TriangleFan, 4, DrawElementsType.UnsignedInt, 1 * sizeof(uint));
 
             this.SwapBuffers();
         }
