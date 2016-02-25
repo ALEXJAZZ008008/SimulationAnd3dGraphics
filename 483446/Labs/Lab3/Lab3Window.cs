@@ -28,7 +28,7 @@ namespace Labs.Lab3
         private int[] mVAO_IDs = new int[3];
         private ShaderUtility mShader;
         private ModelUtility mModelModelUtility, mCylinderModelUtility;
-        private Matrix4 mView, mModelModel, mCylinderModel, mGroundModel;
+        private Matrix4 mView, mEyePosition, mModelModel, mCylinderModel, mGroundModel;
 
         protected override void OnLoad(EventArgs e)
         {
@@ -46,6 +46,7 @@ namespace Labs.Lab3
             int vNormalLocation = GL.GetAttribLocation(mShader.ShaderProgramID, "vNormal");
             int uView = GL.GetUniformLocation(mShader.ShaderProgramID, "uView");
             int uLightPositionLocation = GL.GetUniformLocation(mShader.ShaderProgramID,"uLightPosition");
+            int uEyePosition = GL.GetUniformLocation(mShader.ShaderProgramID, "uEyePosition");
 
             GL.GenVertexArrays(mVAO_IDs.Length, mVAO_IDs);
             GL.GenBuffers(mVBO_IDs.Length, mVBO_IDs);
@@ -72,6 +73,8 @@ namespace Labs.Lab3
 
             GL.EnableVertexAttribArray(vPositionLocation);
             GL.VertexAttribPointer(vPositionLocation, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 0);
+
+            GL.BindVertexArray(0);
 
             mModelModelUtility = ModelUtility.LoadModel(@"Utility/Models/model1.bin"); 
 
@@ -102,7 +105,9 @@ namespace Labs.Lab3
 
             GL.EnableVertexAttribArray(vPositionLocation);
             GL.VertexAttribPointer(vPositionLocation, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 0);
-            
+
+            GL.BindVertexArray(0);
+
             mCylinderModelUtility = ModelUtility.LoadModel(@"Utility/Models/cylinder.bin");
 
             GL.BindVertexArray(mVAO_IDs[2]);
@@ -138,6 +143,9 @@ namespace Labs.Lab3
             mView = Matrix4.CreateTranslation(0, -1.5f, 0);
             GL.UniformMatrix4(uView, true, ref mView);
 
+            mEyePosition = Matrix4.CreateTranslation(0, -1.5f, 0);
+            GL.UniformMatrix4(uEyePosition, true, ref mEyePosition);
+
             mGroundModel = Matrix4.CreateTranslation(0, 0, -5f);
             mModelModel = Matrix4.CreateTranslation(0, 1, -5f);
             mCylinderModel = Matrix4.CreateTranslation(0, 0, -5f);
@@ -169,27 +177,34 @@ namespace Labs.Lab3
             if (e.KeyChar == 'w')
             {
                 mView = mView * Matrix4.CreateTranslation(0.0f, 0.0f, 0.05f);
+                mEyePosition = mEyePosition * Matrix4.CreateTranslation(0.0f, 0.0f, -0.05f);
                 int uView = GL.GetUniformLocation(mShader.ShaderProgramID, "uView");
+                int uEyePosition = GL.GetUniformLocation(mShader.ShaderProgramID, "uEyePosition");
                 GL.UniformMatrix4(uView, true, ref mView);
+                GL.UniformMatrix4(uEyePosition, true, ref mEyePosition);
             }
 
             if (e.KeyChar == 'a')
             {
                 mView = mView * Matrix4.CreateRotationY(-0.025f);
                 int uView = GL.GetUniformLocation(mShader.ShaderProgramID, "uView");
-                GL.UniformMatrix4(uView, true, ref mView);            
+                GL.UniformMatrix4(uView, true, ref mView);
             }
 
             if (e.KeyChar == 's')
             {
                 mView = mView * Matrix4.CreateTranslation(0.0f, 0.0f, -0.05f);
+                mEyePosition = mEyePosition * Matrix4.CreateTranslation(0.0f, 0.0f, 0.05f);
                 int uView = GL.GetUniformLocation(mShader.ShaderProgramID, "uView");
+                int uEyePosition = GL.GetUniformLocation(mShader.ShaderProgramID, "uEyePosition");
                 GL.UniformMatrix4(uView, true, ref mView);
+                GL.UniformMatrix4(uEyePosition, true, ref mEyePosition);
             }
 
             if (e.KeyChar == 'd')
             {
                 mView = mView * Matrix4.CreateRotationY(0.025f);
+                mEyePosition = mEyePosition * Matrix4.CreateRotationY(-0.025f);
                 int uView = GL.GetUniformLocation(mShader.ShaderProgramID, "uView");
                 GL.UniformMatrix4(uView, true, ref mView);
             }

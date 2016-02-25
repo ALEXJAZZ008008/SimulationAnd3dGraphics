@@ -65,3 +65,4 @@ G:\08214\Labs\bin\Debug\Labs.pdb
 G:\08214\Labs\bin\Debug\OpenTK.dll
 G:\08214\Labs\obj\Debug\Labs.exe
 G:\08214\Labs\obj\Debug\Labs.pdb
+G:\08214\Labs\obj\Debug\Labs.csprojResolveAssemblyReference.cache
