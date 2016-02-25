@@ -38,7 +38,7 @@ namespace Labs.Lab3
             GL.Enable(EnableCap.DepthTest);
             GL.Enable(EnableCap.CullFace);
 
-            mShader = new ShaderUtility(@"Lab3/Shaders/vLighting.vert", @"Lab3/Shaders/fPassThrough.frag");
+            mShader = new ShaderUtility(@"Lab3/Shaders/vPassThrough.vert", @"Lab3/Shaders/fLighting.frag");
             GL.UseProgram(mShader.ShaderProgramID);
 
             int vPositionLocation = GL.GetAttribLocation(mShader.ShaderProgramID, "vPosition");
@@ -49,10 +49,10 @@ namespace Labs.Lab3
             GL.GenVertexArrays(mVAO_IDs.Length, mVAO_IDs);
             GL.GenBuffers(mVBO_IDs.Length, mVBO_IDs);
 
-            float[] vertices = new float[] {-10, 0, -10, 0, 1, 0,
+            float[] vertices = new float[] { -10, 0, -10, 0, 1, 0,
                                              -10, 0, 10, 0, 1, 0,
                                              10, 0, 10, 0, 1, 0,
-                                             10, 0, -10, 0, 1, 0,};
+                                             10, 0, -10, 0, 1, 0 };
 
             GL.BindVertexArray(mVAO_IDs[0]);
             GL.BindBuffer(BufferTarget.ArrayBuffer, mVBO_IDs[0]);
@@ -108,8 +108,8 @@ namespace Labs.Lab3
             mGroundModel = Matrix4.CreateTranslation(0, 0, -5f);
             mSphereModel = Matrix4.CreateTranslation(0, 1, -5f);
 
-            Vector3 lightPosition = new Vector3(2, 1, -8.5f);
-            GL.Uniform3(uLightPositionLocation, lightPosition);
+            Vector4 lightPosition = Vector4.Transform(new Vector4(2, 1, -8.5f, 1), mView);
+            GL.Uniform4(uLightPositionLocation, lightPosition);
 
             base.OnLoad(e);
             
