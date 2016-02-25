@@ -28,7 +28,7 @@ namespace Labs.Lab3
         private int[] mVAO_IDs = new int[3];
         private ShaderUtility mShader;
         private ModelUtility mModelModelUtility, mCylinderModelUtility;
-        private Matrix4 mView, mEyePosition, mModelModel, mCylinderModel, mGroundModel;
+        private Matrix4 mView, mModelModel, mCylinderModel, mGroundModel;
 
         protected override void OnLoad(EventArgs e)
         {
@@ -143,15 +143,15 @@ namespace Labs.Lab3
             mView = Matrix4.CreateTranslation(0, -1.5f, 0);
             GL.UniformMatrix4(uView, true, ref mView);
 
-            mEyePosition = Matrix4.CreateTranslation(0, -1.5f, 0);
-            GL.UniformMatrix4(uEyePosition, true, ref mEyePosition);
-
             mGroundModel = Matrix4.CreateTranslation(0, 0, -5f);
             mModelModel = Matrix4.CreateTranslation(0, 1, -5f);
             mCylinderModel = Matrix4.CreateTranslation(0, 0, -5f);
 
             Vector4 lightPosition = Vector4.Transform(new Vector4(2, 1, -8.5f, 1), mView);
             GL.Uniform4(uLightPositionLocation, lightPosition);
+
+            Vector4 eyePosition = Vector4.Transform(new Vector4(0, 0, 0, 1), mView);
+            GL.Uniform4(uEyePosition, eyePosition);
 
             base.OnLoad(e);
         }
@@ -177,11 +177,8 @@ namespace Labs.Lab3
             if (e.KeyChar == 'w')
             {
                 mView = mView * Matrix4.CreateTranslation(0.0f, 0.0f, 0.05f);
-                mEyePosition = mEyePosition * Matrix4.CreateTranslation(0.0f, 0.0f, -0.05f);
                 int uView = GL.GetUniformLocation(mShader.ShaderProgramID, "uView");
-                int uEyePosition = GL.GetUniformLocation(mShader.ShaderProgramID, "uEyePosition");
                 GL.UniformMatrix4(uView, true, ref mView);
-                GL.UniformMatrix4(uEyePosition, true, ref mEyePosition);
             }
 
             if (e.KeyChar == 'a')
@@ -194,17 +191,13 @@ namespace Labs.Lab3
             if (e.KeyChar == 's')
             {
                 mView = mView * Matrix4.CreateTranslation(0.0f, 0.0f, -0.05f);
-                mEyePosition = mEyePosition * Matrix4.CreateTranslation(0.0f, 0.0f, 0.05f);
                 int uView = GL.GetUniformLocation(mShader.ShaderProgramID, "uView");
-                int uEyePosition = GL.GetUniformLocation(mShader.ShaderProgramID, "uEyePosition");
                 GL.UniformMatrix4(uView, true, ref mView);
-                GL.UniformMatrix4(uEyePosition, true, ref mEyePosition);
             }
 
             if (e.KeyChar == 'd')
             {
                 mView = mView * Matrix4.CreateRotationY(0.025f);
-                mEyePosition = mEyePosition * Matrix4.CreateRotationY(-0.025f);
                 int uView = GL.GetUniformLocation(mShader.ShaderProgramID, "uView");
                 GL.UniformMatrix4(uView, true, ref mView);
             }
