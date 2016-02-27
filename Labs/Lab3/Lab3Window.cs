@@ -46,10 +46,18 @@ namespace Labs.Lab3
             int vNormalLocation = GL.GetAttribLocation(mShader.ShaderProgramID, "vNormal");
             int uView = GL.GetUniformLocation(mShader.ShaderProgramID, "uView");
             int uEyePositionLocation = GL.GetUniformLocation(mShader.ShaderProgramID, "uEyePosition");
-            int uLightPositionLocation = GL.GetUniformLocation(mShader.ShaderProgramID,"uLight.Position");
-            int uAmbientLightLocation = GL.GetUniformLocation(mShader.ShaderProgramID,"uLight.AmbientLight");
-            int uDiffuseLightLocation = GL.GetUniformLocation(mShader.ShaderProgramID, "uLight.DiffuseLight");
-            int uSpecularLightLocation = GL.GetUniformLocation(mShader.ShaderProgramID, "uLight.SpecularLight");
+            int uLightPositionLocation0 = GL.GetUniformLocation(mShader.ShaderProgramID,"uLight[0].Position");
+            int uAmbientLightLocation0 = GL.GetUniformLocation(mShader.ShaderProgramID,"uLight[0].AmbientLight");
+            int uDiffuseLightLocation0 = GL.GetUniformLocation(mShader.ShaderProgramID, "uLight[0].DiffuseLight");
+            int uSpecularLightLocation0 = GL.GetUniformLocation(mShader.ShaderProgramID, "uLight[0].SpecularLight");
+            int uLightPositionLocation1 = GL.GetUniformLocation(mShader.ShaderProgramID, "uLight[1].Position");
+            int uAmbientLightLocation1 = GL.GetUniformLocation(mShader.ShaderProgramID, "uLight[1].AmbientLight");
+            int uDiffuseLightLocation1 = GL.GetUniformLocation(mShader.ShaderProgramID, "uLight[1].DiffuseLight");
+            int uSpecularLightLocation1 = GL.GetUniformLocation(mShader.ShaderProgramID, "uLight[1].SpecularLight");
+            int uLightPositionLocation2 = GL.GetUniformLocation(mShader.ShaderProgramID, "uLight[2].Position");
+            int uAmbientLightLocation2 = GL.GetUniformLocation(mShader.ShaderProgramID, "uLight[2].AmbientLight");
+            int uDiffuseLightLocation2 = GL.GetUniformLocation(mShader.ShaderProgramID, "uLight[2].DiffuseLight");
+            int uSpecularLightLocation2 = GL.GetUniformLocation(mShader.ShaderProgramID, "uLight[2].SpecularLight");
 
             GL.GenVertexArrays(mVAO_IDs.Length, mVAO_IDs);
             GL.GenBuffers(mVBO_IDs.Length, mVBO_IDs);
@@ -153,13 +161,29 @@ namespace Labs.Lab3
             Vector4 eyePosition = Vector4.Transform(new Vector4(0, 0, 0, 1), mView);
             GL.Uniform4(uEyePositionLocation, eyePosition);
 
-            Vector4 lightPosition = Vector4.Transform(new Vector4(2, 4, -8.5f, 1), mView);
-            GL.Uniform4(uLightPositionLocation, lightPosition);
+            Vector4 lightPosition0 = Vector4.Transform(new Vector4(2, 4, -8.5f, 1), mView);
+            GL.Uniform4(uLightPositionLocation0, lightPosition0);
 
-            Vector3 colour = new Vector3(1.0f, 1.0f, 1.0f);
-            GL.Uniform3(uAmbientLightLocation, colour);
-            GL.Uniform3(uDiffuseLightLocation, colour);
-            GL.Uniform3(uSpecularLightLocation, colour);
+            Vector4 lightPosition1 = Vector4.Transform(new Vector4(0, 6, -8.5f, 1), mView);
+            GL.Uniform4(uLightPositionLocation1, lightPosition1);
+
+            Vector4 lightPosition2 = Vector4.Transform(new Vector4(-2, 4, -8.5f, 1), mView);
+            GL.Uniform4(uLightPositionLocation2, lightPosition2);
+
+            Vector3 colour0 = new Vector3(1.0f, 0.0f, 0.0f);
+            GL.Uniform3(uAmbientLightLocation0, colour0);
+            GL.Uniform3(uDiffuseLightLocation0, colour0);
+            GL.Uniform3(uSpecularLightLocation0, colour0);
+
+            Vector3 colour1 = new Vector3(0.0f, 1.0f, 0.0f);
+            GL.Uniform3(uAmbientLightLocation1, colour1);
+            GL.Uniform3(uDiffuseLightLocation1, colour1);
+            GL.Uniform3(uSpecularLightLocation1, colour1);
+
+            Vector3 colour2 = new Vector3(0.0f, 0.0f, 1.0f);
+            GL.Uniform3(uAmbientLightLocation2, colour2);
+            GL.Uniform3(uDiffuseLightLocation2, colour2);
+            GL.Uniform3(uSpecularLightLocation2, colour2);
 
             base.OnLoad(e);
         }
