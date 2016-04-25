@@ -92,7 +92,7 @@ namespace Labs.Lab4
             Matrix4 m = Matrix4.CreateTranslation(0, 0, 0);
             GL.UniformMatrix4(uViewLocation, true, ref m);
 
-            mSquareMatrix = Matrix4.CreateScale(1f) * Matrix4.CreateRotationZ(0.5f) * Matrix4.CreateTranslation(0, 0, 0);
+            mSquareMatrix = Matrix4.CreateScale(1f) * Matrix4.CreateRotationZ(0.5f) * Matrix4.CreateTranslation(0.5f, 0.5f, 0);
             mCircleRadius = 0.1f;
             mCirclePosition = new Vector3(0, 0, 0);
             mPreviousCirclePosition = mCirclePosition;
