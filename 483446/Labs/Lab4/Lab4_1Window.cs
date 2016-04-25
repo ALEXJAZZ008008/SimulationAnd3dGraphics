@@ -13,7 +13,7 @@ namespace Labs.Lab4
         private int[] mVertexBufferObjectIDArray = new int[2];
         private ShaderUtility mShader;
         private Matrix4 mSquareMatrix;
-        private Vector3 mCirclePosition;
+        private Vector3 mCirclePosition, mPreviousCirclePosition;
         private Vector3 mCircleVelocity;
         private float mCircleRadius;
 
@@ -95,6 +95,7 @@ namespace Labs.Lab4
             mSquareMatrix = Matrix4.CreateScale(1f) * Matrix4.CreateRotationZ(0.0f) * Matrix4.CreateTranslation(0, 0, 0);
             mCircleRadius = 0.1f;
             mCirclePosition = new Vector3(0, 0, 0);
+            mPreviousCirclePosition = mCirclePosition;
             mCircleVelocity = new Vector3(0.2f, 0.1f, 0);
 
             base.OnLoad(e);
@@ -146,13 +147,19 @@ namespace Labs.Lab4
 
             if ((mCirclePosition.X + mCircleRadius) > 1 || (mCirclePosition.X - mCircleRadius) < -1)
             {
+                mCirclePosition = mPreviousCirclePosition;
+
                 mCircleVelocity.X = -mCircleVelocity.X;
             }
 
             if ((mCirclePosition.Y + mCircleRadius) > 1 || (mCirclePosition.Y - mCircleRadius) < -1)
             {
+                mCirclePosition = mPreviousCirclePosition;
+
                 mCircleVelocity.Y = -mCircleVelocity.Y;
             }
+
+            mPreviousCirclePosition = mCirclePosition;
         }
 
         protected override void OnRenderFrame(FrameEventArgs e)
