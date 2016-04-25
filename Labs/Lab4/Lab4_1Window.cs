@@ -8,6 +8,7 @@ namespace Labs.Lab4
 {
     public class Lab4_1Window : GameWindow
     {
+        private Timer mTimer;
         private int[] mVertexArrayObjectIDArray = new int[2];
         private int[] mVertexBufferObjectIDArray = new int[2];
         private ShaderUtility mShader;
@@ -93,6 +94,9 @@ namespace Labs.Lab4
             mCirclePosition = new Vector3(0, 0, 0);
 
             base.OnLoad(e);
+
+            mTimer = new Timer();
+            mTimer.Start();
         }
 
         private void SetCamera()
@@ -133,7 +137,8 @@ namespace Labs.Lab4
         protected override void OnUpdateFrame(FrameEventArgs e)
         {
             base.OnUpdateFrame(e);
-            mCirclePosition.X = mCirclePosition.X + 0.2f;
+            float timestep = mTimer.GetElapsedSeconds();
+            mCirclePosition.X = mCirclePosition.X + 0.2f * timestep;
         }
 
         protected override void OnRenderFrame(FrameEventArgs e)
