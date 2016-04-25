@@ -92,7 +92,7 @@ namespace Labs.Lab4
             Matrix4 m = Matrix4.CreateTranslation(0, 0, 0);
             GL.UniformMatrix4(uViewLocation, true, ref m);
 
-            mSquareMatrix = Matrix4.CreateScale(1f) * Matrix4.CreateRotationZ(0.5f) * Matrix4.CreateTranslation(0.5f, 0.5f, 0);
+            mSquareMatrix = Matrix4.CreateScale(3f) * Matrix4.CreateRotationZ(0.5f) * Matrix4.CreateTranslation(0.5f, 0.5f, 0);
             mCircleRadius = 0.1f;
             mCirclePosition = new Vector3(0, 0, 0);
             mPreviousCirclePosition = mCirclePosition;
@@ -147,7 +147,7 @@ namespace Labs.Lab4
 
             Vector3 circleInSquareSpace = Vector3.Transform(mCirclePosition, mSquareMatrix.Inverted());
 
-            if ((circleInSquareSpace.X + mCircleRadius) > 1 || (circleInSquareSpace.X - mCircleRadius) < -1)
+            if ((circleInSquareSpace.X + (mCircleRadius / mSquareMatrix.ExtractScale().X)) > 1 || (circleInSquareSpace.X - (mCircleRadius / mSquareMatrix.ExtractScale().X)) < -1)
             {
                 mCirclePosition = mPreviousCirclePosition;
 
@@ -155,7 +155,7 @@ namespace Labs.Lab4
                 mCircleVelocity = mCircleVelocity - 2 * Vector3.Dot(normal, mCircleVelocity) * normal;
             }
 
-            if ((circleInSquareSpace.Y + mCircleRadius) > 1 || (circleInSquareSpace.Y - mCircleRadius) < -1)
+            if ((circleInSquareSpace.Y + (mCircleRadius / mSquareMatrix.ExtractScale().Y)) > 1 || (circleInSquareSpace.Y - (mCircleRadius / mSquareMatrix.ExtractScale().Y)) < -1)
             {
                 mCirclePosition = mPreviousCirclePosition;
 
