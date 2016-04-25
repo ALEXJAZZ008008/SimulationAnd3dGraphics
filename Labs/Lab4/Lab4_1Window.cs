@@ -184,6 +184,20 @@ namespace Labs.Lab4
             GL.BindVertexArray(mVertexArrayObjectIDArray[1]);
             GL.DrawArrays(PrimitiveType.LineLoop, 0, 100);
 
+            GL.Uniform4(uColourLocation, Color4.Red);
+
+            Matrix4 m = mSquareMatrix * mSquareMatrix.Inverted();
+
+            GL.UniformMatrix4(uModelMatrixLocation, true, ref m);
+            GL.BindVertexArray(mVertexArrayObjectIDArray[0]);
+            GL.DrawArrays(PrimitiveType.LineLoop, 0, 4);
+
+            m = (Matrix4.CreateScale(mCircleRadius) * Matrix4.CreateTranslation(mCirclePosition)) * mSquareMatrix.Inverted();
+
+            GL.UniformMatrix4(uModelMatrixLocation, true, ref m);
+            GL.BindVertexArray(mVertexArrayObjectIDArray[1]);
+            GL.DrawArrays(PrimitiveType.LineLoop, 0, 100);
+
             this.SwapBuffers();
         }
 
