@@ -144,7 +144,7 @@ namespace Labs.Lab4
             float timestep = mTimer.GetElapsedSeconds();
             mCirclePosition = mCirclePosition + mCircleVelocity * timestep;
 
-            if (mCirclePosition.X > 1)
+            if (mCirclePosition.X + mCircleRadius > 1)
             {
                 mCircleVelocity = Vector3.Zero;
             }
