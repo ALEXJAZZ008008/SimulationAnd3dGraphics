@@ -152,29 +152,26 @@ namespace Labs.Lab4
 
             if ((circleInSquareSpace.X + (mCircleRadius / mSquareMatrix.ExtractScale().X)) >= 1 || (circleInSquareSpace.X - (mCircleRadius / mSquareMatrix.ExtractScale().X)) <= -1)
             {
-                mCirclePosition = mPreviousCirclePosition;
-
                 Vector3 normal = Vector3.Transform(new Vector3(-1, 0, 0), mSquareMatrix.ExtractRotation());
                 mCircleVelocity = mCircleVelocity - 2 * Vector3.Dot(normal, mCircleVelocity) * normal;
+
+                mCirclePosition = mPreviousCirclePosition;
             }
 
             if ((circleInSquareSpace.Y + (mCircleRadius / mSquareMatrix.ExtractScale().Y)) >= 1 || (circleInSquareSpace.Y - (mCircleRadius / mSquareMatrix.ExtractScale().Y)) <= -1)
             {
-                mCirclePosition = mPreviousCirclePosition;
-
                 Vector3 normal = Vector3.Transform(new Vector3(0, -1, 0), mSquareMatrix.ExtractRotation());
                 mCircleVelocity = mCircleVelocity - 2 * Vector3.Dot(normal, mCircleVelocity) * normal;
+
+                mCirclePosition = mPreviousCirclePosition;
             }
 
             if (Math.Sqrt(Math.Pow((mCirclePosition.X - mFixedCirclePosition.X), 2) + Math.Pow((mCirclePosition.Y - mFixedCirclePosition.Y), 2)) <= (mCircleRadius + mFixedCircleRadius))
             {
+                Vector3 normal = (mCirclePosition - mFixedCirclePosition).Normalized();
+                mCircleVelocity = mCircleVelocity - 2 * Vector3.Dot(normal, mCircleVelocity) * normal;
+
                 mCirclePosition = mPreviousCirclePosition;
-
-                Vector3 normal = Vector3.Transform(new Vector3(0, -1, 0), mSquareMatrix.ExtractRotation());
-                mCircleVelocity = mCircleVelocity - 2 * Vector3.Dot(normal, mCircleVelocity) * normal;
-
-                normal = Vector3.Transform(new Vector3(-1, 0, 0), mSquareMatrix.ExtractRotation());
-                mCircleVelocity = mCircleVelocity - 2 * Vector3.Dot(normal, mCircleVelocity) * normal;
             }
 
             mPreviousCirclePosition = mCirclePosition;
