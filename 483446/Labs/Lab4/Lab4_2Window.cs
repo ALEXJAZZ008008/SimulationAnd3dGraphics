@@ -161,9 +161,9 @@ namespace Labs.Lab4
             GL.BindVertexArray(mVertexArrayObjectIDArray[0]);
             GL.DrawArrays(PrimitiveType.LineLoop, 0, 4);
 
-            Matrix4 circleMatrix = Matrix4.CreateScale(mCircleRadius) * Matrix4.CreateTranslation(mCirclePosition);
+            Matrix4 mCircleMatrix = Matrix4.CreateScale(mCircleRadius) * Matrix4.CreateTranslation(mCirclePosition);
 
-            GL.UniformMatrix4(uModelMatrixLocation, true, ref circleMatrix);
+            GL.UniformMatrix4(uModelMatrixLocation, true, ref mCircleMatrix);
             GL.BindVertexArray(mVertexArrayObjectIDArray[1]);
             GL.DrawArrays(PrimitiveType.LineLoop, 0, 100);
 
