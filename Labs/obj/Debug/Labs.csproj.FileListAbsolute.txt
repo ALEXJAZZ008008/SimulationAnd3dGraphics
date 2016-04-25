@@ -91,3 +91,4 @@ C:\Users\Alex\Desktop\Programs\Coursework\08214\Labs\obj\Debug\Labs.csprojResolv
 \\data.adir.hull.ac.uk\home4\483\483446\08214\Labs\bin\Debug\OpenTK.dll
 \\data.adir.hull.ac.uk\home4\483\483446\08214\Labs\obj\Debug\Labs.exe
 \\data.adir.hull.ac.uk\home4\483\483446\08214\Labs\obj\Debug\Labs.pdb
+\\data.adir.hull.ac.uk\home4\483\483446\08214\Labs\obj\Debug\Labs.csprojResolveAssemblyReference.cache
