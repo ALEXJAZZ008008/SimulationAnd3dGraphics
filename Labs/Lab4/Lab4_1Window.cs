@@ -93,12 +93,13 @@ namespace Labs.Lab4
             GL.UniformMatrix4(uViewLocation, true, ref m);
 
             mSquareMatrix = Matrix4.CreateScale(3, 2, 1) * Matrix4.CreateRotationZ(0.5f) * Matrix4.CreateTranslation(0.5f, 0.5f, 0);
+
             mCircleRadius = 0.1f;
-            mFixedCircleRadius = 0.1f;
+            mFixedCircleRadius = 0.2f;
             mCirclePosition = new Vector3(0, 0, 0);
-            mFixedCirclePosition = new Vector3(0, 0, 0);
+            mFixedCirclePosition = new Vector3(0.5f, 0.5f, 0);
             mPreviousCirclePosition = mCirclePosition;
-            mCircleVelocity = new Vector3(0.5f, 0.5f, 0);
+            mCircleVelocity = new Vector3(1, 1, 0);
 
             base.OnLoad(e);
 
@@ -149,7 +150,7 @@ namespace Labs.Lab4
 
             Vector3 circleInSquareSpace = Vector3.Transform(mCirclePosition, mSquareMatrix.Inverted());
 
-            if ((circleInSquareSpace.X + (mCircleRadius / mSquareMatrix.ExtractScale().X)) > 1 || (circleInSquareSpace.X - (mCircleRadius / mSquareMatrix.ExtractScale().X)) < -1)
+            if ((circleInSquareSpace.X + (mCircleRadius / mSquareMatrix.ExtractScale().X)) >= 1 || (circleInSquareSpace.X - (mCircleRadius / mSquareMatrix.ExtractScale().X)) <= -1)
             {
                 mCirclePosition = mPreviousCirclePosition;
 
@@ -157,11 +158,22 @@ namespace Labs.Lab4
                 mCircleVelocity = mCircleVelocity - 2 * Vector3.Dot(normal, mCircleVelocity) * normal;
             }
 
-            if ((circleInSquareSpace.Y + (mCircleRadius / mSquareMatrix.ExtractScale().Y)) > 1 || (circleInSquareSpace.Y - (mCircleRadius / mSquareMatrix.ExtractScale().Y)) < -1)
+            if ((circleInSquareSpace.Y + (mCircleRadius / mSquareMatrix.ExtractScale().Y)) >= 1 || (circleInSquareSpace.Y - (mCircleRadius / mSquareMatrix.ExtractScale().Y)) <= -1)
             {
                 mCirclePosition = mPreviousCirclePosition;
 
                 Vector3 normal = Vector3.Transform(new Vector3(0, -1, 0), mSquareMatrix.ExtractRotation());
+                mCircleVelocity = mCircleVelocity - 2 * Vector3.Dot(normal, mCircleVelocity) * normal;
+            }
+
+            if (Math.Sqrt(Math.Pow((mCirclePosition.X - mFixedCirclePosition.X), 2) + Math.Pow((mCirclePosition.Y - mFixedCirclePosition.Y), 2)) <= (mCircleRadius + mFixedCircleRadius))
+            {
+                mCirclePosition = mPreviousCirclePosition;
+
+                Vector3 normal = Vector3.Transform(new Vector3(0, -1, 0), mSquareMatrix.ExtractRotation());
+                mCircleVelocity = mCircleVelocity - 2 * Vector3.Dot(normal, mCircleVelocity) * normal;
+
+                normal = Vector3.Transform(new Vector3(-1, 0, 0), mSquareMatrix.ExtractRotation());
                 mCircleVelocity = mCircleVelocity - 2 * Vector3.Dot(normal, mCircleVelocity) * normal;
             }
 
