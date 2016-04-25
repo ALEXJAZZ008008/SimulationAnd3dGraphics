@@ -96,7 +96,7 @@ namespace Labs.Lab4
             mCircleRadius = 0.1f;
             mCirclePosition = new Vector3(0, 0, 0);
             mPreviousCirclePosition = mCirclePosition;
-            mCircleVelocity = new Vector3(0.5f, 0.25f, 0);
+            mCircleVelocity = new Vector3(0.5f, 0.5f, 0);
 
             base.OnLoad(e);
 
@@ -151,7 +151,7 @@ namespace Labs.Lab4
             {
                 mCirclePosition = mPreviousCirclePosition;
 
-                Vector3 normal = new Vector3(-1, 0, 0);
+                Vector3 normal = Vector3.Transform(new Vector3(-1, 0, 0), mSquareMatrix.ExtractRotation());
                 mCircleVelocity = mCircleVelocity - 2 * Vector3.Dot(normal, mCircleVelocity) * normal;
             }
 
@@ -159,7 +159,7 @@ namespace Labs.Lab4
             {
                 mCirclePosition = mPreviousCirclePosition;
 
-                Vector3 normal = new Vector3(0, -1, 0);
+                Vector3 normal = Vector3.Transform(new Vector3(0, -1, 0), mSquareMatrix.ExtractRotation());
                 mCircleVelocity = mCircleVelocity - 2 * Vector3.Dot(normal, mCircleVelocity) * normal;
             }
 
