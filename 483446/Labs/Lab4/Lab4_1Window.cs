@@ -143,6 +143,11 @@ namespace Labs.Lab4
             base.OnUpdateFrame(e);
             float timestep = mTimer.GetElapsedSeconds();
             mCirclePosition = mCirclePosition + mCircleVelocity * timestep;
+
+            if (mCirclePosition.X > 1)
+            {
+                mCircleVelocity = Vector3.Zero;
+            }
         }
 
         protected override void OnRenderFrame(FrameEventArgs e)
