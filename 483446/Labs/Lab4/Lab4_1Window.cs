@@ -97,8 +97,8 @@ namespace Labs.Lab4
 
             mCircleRadius = 0.1f;
             mCircleRadius2 = 0.2f;
-            mCirclePosition = new Vector3(0, 0, 0);
-            mCirclePosition2 = new Vector3(0.5f, 0.5f, 0);
+            mCirclePosition = new Vector3(1.5f, 1.5f, 0);
+            mCirclePosition2 = new Vector3(2, 2, 0);
             mPreviousCirclePosition = mCirclePosition;
             mCircleVelocity = new Vector3(1, 1, 0);
 
@@ -170,6 +170,21 @@ namespace Labs.Lab4
             if (Math.Sqrt(Math.Pow((mCirclePosition.X - mCirclePosition2.X), 2) + Math.Pow((mCirclePosition.Y - mCirclePosition2.Y), 2)) <= (mCircleRadius + mCircleRadius2))
             {
                 Vector3 normal = (mCirclePosition - mCirclePosition2).Normalized();
+                mCircleVelocity = mCircleVelocity - 2 * Vector3.Dot(normal, mCircleVelocity) * normal;
+
+                mCirclePosition = mPreviousCirclePosition;
+            }
+
+            Vector3 vector1 = new Vector3(1, 1, 0);
+            Vector3 vector2 = new Vector3(-1, 1, 0);
+            Vector3 vector3 = (mCirclePosition - vector2);
+            vector1 = (vector1 - vector2).Normalized();
+            vector1 = Vector3.Multiply(vector1, vector1);
+            float ifArgument = Vector3.Dot(vector3, vector1);
+
+            if (ifArgument <= mCircleRadius)
+            {
+                Vector3 normal = new Vector3(-1, 0, 0);
                 mCircleVelocity = mCircleVelocity - 2 * Vector3.Dot(normal, mCircleVelocity) * normal;
 
                 mCirclePosition = mPreviousCirclePosition;
