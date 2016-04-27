@@ -100,7 +100,7 @@ namespace Labs.Lab4
             mCirclePosition = new Vector3(1.5f, 1.5f, 0);
             mCirclePosition2 = new Vector3(2, 2, 0);
             mPreviousCirclePosition = mCirclePosition;
-            mCircleVelocity = new Vector3(1, 1, 0);
+            mCircleVelocity = new Vector3(1.5f, 1, 0);
 
             base.OnLoad(e);
 
@@ -175,19 +175,136 @@ namespace Labs.Lab4
                 mCirclePosition = mPreviousCirclePosition;
             }
 
-            Vector3 vector1 = new Vector3(1, 1, 0);
-            Vector3 vector2 = new Vector3(-1, 1, 0);
-            Vector3 vector3 = (mCirclePosition - vector2);
-            vector1 = (vector1 - vector2).Normalized();
-            vector1 = Vector3.Multiply(vector1, vector1);
-            float ifArgument = Vector3.Dot(vector3, vector1);
+            Vector3 L1p = new Vector3(-1, 1, 0);
+            Vector3 L2p = new Vector3(-1, -1, 0);
+            Vector3 dot = new Vector3(mCirclePosition - L2p);
+            Vector3 dot2 = (L1p - L2p).Normalized();
+            Vector3 A = ((dot.X * dot2.X) + (dot.Y * dot2.Y)) * dot2;
+            float B = (dot.X * dot2.X) + (dot.Y * dot2.Y);
+            Vector3 result = L2p + A - mCirclePosition;
+            Vector3 f = mCirclePosition - L1p;
+            Vector3 g = mCirclePosition - L2p;
+            Vector3 h = L2p + A;
 
-            if (ifArgument <= mCircleRadius)
+            if (result.Length < mCircleRadius && A.Length < new Vector3(L1p - L2p).Length && B > 0)
             {
-                Vector3 normal = new Vector3(-1, 0, 0);
+                Vector3 normal = (new Vector3(mCirclePosition.X, mCirclePosition.Y, mCirclePosition.Z) - new Vector3(h.X, h.Y, h.Z)).Normalized();
                 mCircleVelocity = mCircleVelocity - 2 * Vector3.Dot(normal, mCircleVelocity) * normal;
-
                 mCirclePosition = mPreviousCirclePosition;
+            }
+            if (f.Length < mCircleRadius || g.Length < mCircleRadius)
+            {
+                if (g.Length < mCircleRadius)
+                {
+                    Vector3 normal = (new Vector3(mCirclePosition.X, mCirclePosition.Y, mCirclePosition.Z) - new Vector3(L1p.X, L1p.Y, L1p.Z)).Normalized();
+                    mCircleVelocity = mCircleVelocity - 2 * Vector3.Dot(normal, mCircleVelocity) * normal;
+                    mCirclePosition = mPreviousCirclePosition;
+                }
+                else
+                {
+                    Vector3 normal = (new Vector3(mCirclePosition.X, mCirclePosition.Y, mCirclePosition.Z) - new Vector3(L2p.X, L2p.Y, L2p.Z)).Normalized();
+                    mCircleVelocity = mCircleVelocity - 2 * Vector3.Dot(normal, mCircleVelocity) * normal;
+                    mCirclePosition = mPreviousCirclePosition;
+                }
+            }
+
+            L1p = new Vector3(-1, 1, 0);
+            L2p = new Vector3(1, 1, 0);
+            dot = new Vector3(mCirclePosition - L2p);
+            dot2 = (L1p - L2p).Normalized();
+            A = ((dot.X * dot2.X) + (dot.Y * dot2.Y)) * dot2;
+            B = (dot.X * dot2.X) + (dot.Y * dot2.Y);
+            result = L2p + A - mCirclePosition;
+            f = mCirclePosition - L1p;
+            g = mCirclePosition - L2p;
+            h = L2p + A;
+
+            if (result.Length < mCircleRadius && A.Length < new Vector3(L1p - L2p).Length && B > 0)
+            {
+                Vector3 normal = (new Vector3(mCirclePosition.X, mCirclePosition.Y, mCirclePosition.Z) - new Vector3(h.X, h.Y, h.Z)).Normalized();
+                mCircleVelocity = mCircleVelocity - 2 * Vector3.Dot(normal, mCircleVelocity) * normal;
+                mCirclePosition = mPreviousCirclePosition;
+            }
+            if (f.Length < mCircleRadius || g.Length < mCircleRadius)
+            {
+                if (g.Length < mCircleRadius)
+                {
+                    Vector3 normal = (new Vector3(mCirclePosition.X, mCirclePosition.Y, mCirclePosition.Z) - new Vector3(L1p.X, L1p.Y, L1p.Z)).Normalized();
+                    mCircleVelocity = mCircleVelocity - 2 * Vector3.Dot(normal, mCircleVelocity) * normal;
+                    mCirclePosition = mPreviousCirclePosition;
+                }
+                else
+                {
+                    Vector3 normal = (new Vector3(mCirclePosition.X, mCirclePosition.Y, mCirclePosition.Z) - new Vector3(L2p.X, L2p.Y, L2p.Z)).Normalized();
+                    mCircleVelocity = mCircleVelocity - 2 * Vector3.Dot(normal, mCircleVelocity) * normal;
+                    mCirclePosition = mPreviousCirclePosition;
+                }
+            }
+
+            L1p = new Vector3(1, 1, 0);
+            L2p = new Vector3(1, -1, 0);
+            dot = new Vector3(mCirclePosition - L2p);
+            dot2 = (L1p - L2p).Normalized();
+            A = ((dot.X * dot2.X) + (dot.Y * dot2.Y)) * dot2;
+            B = (dot.X * dot2.X) + (dot.Y * dot2.Y);
+            result = L2p + A - mCirclePosition;
+            f = mCirclePosition - L1p;
+            g = mCirclePosition - L2p;
+            h = L2p + A;
+
+            if (result.Length < mCircleRadius && A.Length < new Vector3(L1p - L2p).Length && B > 0)
+            {
+                Vector3 normal = (new Vector3(mCirclePosition.X, mCirclePosition.Y, mCirclePosition.Z) - new Vector3(h.X, h.Y, h.Z)).Normalized();
+                mCircleVelocity = mCircleVelocity - 2 * Vector3.Dot(normal, mCircleVelocity) * normal;
+                mCirclePosition = mPreviousCirclePosition;
+            }
+            if (f.Length < mCircleRadius || g.Length < mCircleRadius)
+            {
+                if (g.Length < mCircleRadius)
+                {
+                    Vector3 normal = (new Vector3(mCirclePosition.X, mCirclePosition.Y, mCirclePosition.Z) - new Vector3(L1p.X, L1p.Y, L1p.Z)).Normalized();
+                    mCircleVelocity = mCircleVelocity - 2 * Vector3.Dot(normal, mCircleVelocity) * normal;
+                    mCirclePosition = mPreviousCirclePosition;
+                }
+                else
+                {
+                    Vector3 normal = (new Vector3(mCirclePosition.X, mCirclePosition.Y, mCirclePosition.Z) - new Vector3(L2p.X, L2p.Y, L2p.Z)).Normalized();
+                    mCircleVelocity = mCircleVelocity - 2 * Vector3.Dot(normal, mCircleVelocity) * normal;
+                    mCirclePosition = mPreviousCirclePosition;
+                }
+            }
+
+            L1p = new Vector3(1, -1, 0);
+            L2p = new Vector3(-1, -1, 0);
+            dot = new Vector3(mCirclePosition - L2p);
+            dot2 = (L1p - L2p).Normalized();
+            A = ((dot.X * dot2.X) + (dot.Y * dot2.Y)) * dot2;
+            B = (dot.X * dot2.X) + (dot.Y * dot2.Y);
+            result = L2p + A - mCirclePosition;
+            f = mCirclePosition - L1p;
+            g = mCirclePosition - L2p;
+            h = L2p + A;
+
+            if (result.Length < mCircleRadius && A.Length < new Vector3(L1p - L2p).Length && B > 0)
+            {
+                Vector3 normal = (new Vector3(mCirclePosition.X, mCirclePosition.Y, mCirclePosition.Z) - new Vector3(h.X, h.Y, h.Z)).Normalized();
+                mCircleVelocity = mCircleVelocity - 2 * Vector3.Dot(normal, mCircleVelocity) * normal;
+                mCirclePosition = mPreviousCirclePosition;
+            }
+            if (f.Length < mCircleRadius || g.Length < mCircleRadius)
+            {
+                if (g.Length < mCircleRadius)
+                {
+                    Vector3 normal = (new Vector3(mCirclePosition.X, mCirclePosition.Y, mCirclePosition.Z) - new Vector3(L1p.X, L1p.Y, L1p.Z)).Normalized();
+                    mCircleVelocity = mCircleVelocity - 2 * Vector3.Dot(normal, mCircleVelocity) * normal;
+                    mCirclePosition = mPreviousCirclePosition;
+                }
+                else
+                {
+                    Vector3 normal = (new Vector3(mCirclePosition.X, mCirclePosition.Y, mCirclePosition.Z) - new Vector3(L2p.X, L2p.Y, L2p.Z)).Normalized();
+                    mCircleVelocity = mCircleVelocity - 2 * Vector3.Dot(normal, mCircleVelocity) * normal;
+                    mCirclePosition = mPreviousCirclePosition;
+                }
             }
 
             mPreviousCirclePosition = mCirclePosition;
