@@ -178,6 +178,16 @@ namespace Labs.Lab4
                 mCirclePosition = mPreviousCirclePosition;
             }
 
+            if (Math.Sqrt(Math.Pow((mCirclePosition.X - mCirclePosition2.X), 2) + Math.Pow((mCirclePosition.Y - mCirclePosition2.Y), 2)) <= (mCircleRadius + mCircleRadius))
+            {
+                Vector3 normal = (mCirclePosition - mCirclePosition2).Normalized();
+                mCircleVelocity = mCircleVelocity - 2 * Vector3.Dot(normal, mCircleVelocity) * normal;
+                mCircleVelocity2 = mCircleVelocity2 - 2 * Vector3.Dot(normal, mCircleVelocity2) * normal;
+
+                mCirclePosition = mPreviousCirclePosition;
+                mCirclePosition2 = mPreviousCirclePosition2;
+            }
+
             mPreviousCirclePosition = mCirclePosition;
 
             Vector3 circleInSquareSpace2 = Vector3.Transform(mCirclePosition2, mSquareMatrix.Inverted());
