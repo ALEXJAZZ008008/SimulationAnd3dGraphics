@@ -26,22 +26,11 @@ namespace Labs.Lab5
         }
 
         private int[] mVBO_IDs = new int[2];
-        private int mVAO_ID;
+        private int mVAO_ID, mTexture_ID;
         private ShaderUtility mShader;
 
         protected override void OnLoad(EventArgs e)
         {
-            string filepath = @"Lab5/11884091_1000345359997175_3654872641334187195_o - Copy.jpg";
-            if (System.IO.File.Exists(filepath)) 
-            { 
-                Bitmap TextureBitmap = new Bitmap(filepath); 
-                BitmapData TextureData = TextureBitmap.LockBits(new System.Drawing.Rectangle(0, 0, TextureBitmap.Width, TextureBitmap.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppRgb);
-            } 
-            else 
-            { 
-                throw new Exception("Could not find file " + filepath);
-            }
-
             // Set some GL state
             GL.ClearColor(Color4.Firebrick);
 
@@ -112,6 +101,32 @@ namespace Labs.Lab5
             GL.VertexAttribPointer(vPositionLocation, 2, VertexAttribPointerType.Float, false, 2 * sizeof(float), 0);
 
             GL.BindVertexArray(0);
+
+            string filepath = @"Lab5/11884091_1000345359997175_3654872641334187195_o - Copy.jpg";
+
+            Bitmap TextureBitmap;
+            BitmapData TextureData;
+
+            if (System.IO.File.Exists(filepath))
+            {
+                TextureBitmap = new Bitmap(filepath);
+
+                TextureData = TextureBitmap.LockBits(new System.Drawing.Rectangle(0, 0, TextureBitmap.Width, TextureBitmap.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppRgb);
+            }
+            else
+            {
+                throw new Exception("Could not find file " + filepath);
+            }
+
+            GL.ActiveTexture(TextureUnit.Texture0);
+            GL.GenTextures(1, out mTexture_ID);
+            GL.BindTexture(TextureTarget.Texture2D, mTexture_ID);
+
+            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, TextureData.Width, TextureData.Height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, TextureData.Scan0);
+
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+            TextureBitmap.UnlockBits(TextureData);
 
             base.OnLoad(e);
 
