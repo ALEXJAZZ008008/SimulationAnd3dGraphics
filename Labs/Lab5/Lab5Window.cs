@@ -74,6 +74,7 @@ namespace Labs.Lab5
             mShader = new ShaderUtility(@"Lab5/Shaders/vTexture.vert", @"Lab5/Shaders/fTexture.frag");
             GL.UseProgram(mShader.ShaderProgramID);
             int vPositionLocation = GL.GetAttribLocation(mShader.ShaderProgramID, "vPosition");
+            int vTexCoords = GL.GetAttribLocation(mShader.ShaderProgramID, "vTexCoords");
 
             mVAO_ID = GL.GenVertexArray();
             GL.GenBuffers(mVBO_IDs.Length, mVBO_IDs);
@@ -98,7 +99,10 @@ namespace Labs.Lab5
             }
 
             GL.EnableVertexAttribArray(vPositionLocation);
-            GL.VertexAttribPointer(vPositionLocation, 2, VertexAttribPointerType.Float, false, 4 * sizeof(float), 2 * sizeof(float));
+            GL.VertexAttribPointer(vPositionLocation, 2, VertexAttribPointerType.Float, false, 4 * sizeof(float), 0);
+
+            GL.EnableVertexAttribArray(vTexCoords);
+            GL.VertexAttribPointer(vTexCoords, 2, VertexAttribPointerType.Float, false, 4 * sizeof(float), 2 * sizeof(float));
 
             GL.BindVertexArray(0);
 
