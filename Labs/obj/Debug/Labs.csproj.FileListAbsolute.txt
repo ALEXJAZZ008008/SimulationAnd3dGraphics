@@ -93,3 +93,32 @@ C:\Users\Alex\Desktop\Programs\Coursework\08214\Labs\obj\Debug\Labs.csprojResolv
 \\data.adir.hull.ac.uk\home4\483\483446\08214\Labs\obj\Debug\Labs.pdb
 \\data.adir.hull.ac.uk\home4\483\483446\08214\Labs\obj\Debug\Labs.csprojResolveAssemblyReference.cache
 G:\08214\Labs\bin\Debug\Lab5\11884091_1000345359997175_3654872641334187195_o - Copy.jpg
+G:\08214\Labs\bin\Debug\ACW\Shaders\fLighting.frag
+G:\08214\Labs\bin\Debug\ACW\Shaders\vPassThrough.vert
+Z:\08214\Labs\bin\Debug\Labs.exe.config
+Z:\08214\Labs\obj\Debug\Labs.exe
+Z:\08214\Labs\obj\Debug\Labs.pdb
+Z:\08214\Labs\bin\Debug\ACW\Shaders\fLighting.frag
+Z:\08214\Labs\bin\Debug\ACW\Shaders\vPassThrough.vert
+Z:\08214\Labs\bin\Debug\Lab2\Shaders\fSimple.frag
+Z:\08214\Labs\bin\Debug\Lab2\Shaders\vLab21.vert
+Z:\08214\Labs\bin\Debug\Lab2\Shaders\vLab22.vert
+Z:\08214\Labs\bin\Debug\Lab3\Shaders\fLighting.frag
+Z:\08214\Labs\bin\Debug\Lab3\Shaders\vPassThrough.vert
+Z:\08214\Labs\bin\Debug\Lab4\Shaders\fLab4.frag
+Z:\08214\Labs\bin\Debug\Lab4\Shaders\vLab4.vert
+Z:\08214\Labs\bin\Debug\Lab5\Shaders\fTexture.frag
+Z:\08214\Labs\bin\Debug\Lab5\Shaders\vTexture.vert
+Z:\08214\Labs\bin\Debug\Lab1\Shaders\fSimple.frag
+Z:\08214\Labs\bin\Debug\Lab1\Shaders\vSimple.vert
+Z:\08214\Labs\bin\Debug\Utility\Models\cylinder.bin
+Z:\08214\Labs\bin\Debug\Utility\Models\lab22model.sjg
+Z:\08214\Labs\bin\Debug\Utility\Models\model1.bin
+Z:\08214\Labs\bin\Debug\Utility\Models\model2.bin
+Z:\08214\Labs\bin\Debug\Utility\Models\model3.bin
+Z:\08214\Labs\bin\Debug\Utility\Models\sphere.bin
+Z:\08214\Labs\bin\Debug\Lab5\11884091_1000345359997175_3654872641334187195_o - Copy.jpg
+Z:\08214\Labs\bin\Debug\Labs.exe
+Z:\08214\Labs\bin\Debug\Labs.pdb
+Z:\08214\Labs\bin\Debug\OpenTK.dll
+Z:\08214\Labs\obj\Debug\Labs.csprojResolveAssemblyReference.cache
