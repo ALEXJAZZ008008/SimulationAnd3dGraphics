@@ -12,7 +12,7 @@ namespace Labs.Lab4
         private int[] mVertexBufferObjectIDArray = new int[2];
         private ShaderUtility mShader;
         private Matrix4 mSquareMatrix;
-        private Vector3 mCirclePosition;
+        private Vector3 mCirclePosition, mPreviousCirclePosition;
         private Vector3 mCircleVelocity;
         private float mCircleRadius;
         private Timer mTimer;
@@ -94,6 +94,7 @@ namespace Labs.Lab4
 
             mCircleRadius = 0.2f;
             mCirclePosition = new Vector3(0, 2, 0);
+            mPreviousCirclePosition = new Vector3(0, 2, 0);
             mCircleVelocity = new Vector3(2, 0, 0);
             mSquareMatrix = Matrix4.CreateScale(4f) * Matrix4.CreateRotationZ(0.0f) * Matrix4.CreateTranslation(0, 0, 0);
 
@@ -136,7 +137,27 @@ namespace Labs.Lab4
             float timestep = mTimer.GetElapsedSeconds();
             Vector3 oldPosition = mCirclePosition;
             mCirclePosition = mCirclePosition + mCircleVelocity * timestep;
-            
+
+            Vector3 circleInSquareSpace = Vector3.Transform(mCirclePosition, mSquareMatrix.Inverted());
+
+            if ((circleInSquareSpace.X + (mCircleRadius / mSquareMatrix.ExtractScale().X)) >= 1 || (circleInSquareSpace.X - (mCircleRadius / mSquareMatrix.ExtractScale().X)) <= -1)
+            {
+                Vector3 normal = Vector3.Transform(new Vector3(-1, 0, 0), mSquareMatrix.ExtractRotation());
+                mCircleVelocity = mCircleVelocity - 2 * Vector3.Dot(normal, mCircleVelocity) * normal;
+
+                mCirclePosition = mPreviousCirclePosition;
+            }
+
+            if ((circleInSquareSpace.Y + (mCircleRadius / mSquareMatrix.ExtractScale().Y)) >= 1 || (circleInSquareSpace.Y - (mCircleRadius / mSquareMatrix.ExtractScale().Y)) <= -1)
+            {
+                Vector3 normal = Vector3.Transform(new Vector3(0, -1, 0), mSquareMatrix.ExtractRotation());
+                mCircleVelocity = mCircleVelocity - 2 * Vector3.Dot(normal, mCircleVelocity) * normal;
+
+                mCirclePosition = mPreviousCirclePosition;
+            }
+
+            mPreviousCirclePosition = mCirclePosition;
+
             base.OnUpdateFrame(e);
         }
 
