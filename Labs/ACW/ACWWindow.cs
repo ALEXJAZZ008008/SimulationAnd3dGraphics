@@ -243,19 +243,15 @@ namespace Labs.ACW
             mView = Matrix4.CreateTranslation(0, -1.5f, 0);
             GL.UniformMatrix4(uView, true, ref mView);
 
-            mWorld = Matrix4.CreateTranslation(0, 1.5f, -5f);
+            mWorld = Matrix4.CreateTranslation(0, 1.5f, -2f);
 
-            mEmitterBoxModel = Matrix4.CreateTranslation(0, 3f, -5f);
-            mEmitterBoxModel = Matrix4.CreateScale(3);
+            mEmitterBoxModel = Matrix4.CreateTranslation(0, 0.60f, 0);
 
-            mGridBox1Model = Matrix4.CreateTranslation(0, 2.25f, -5f);
-            mGridBox1Model = Matrix4.CreateScale(3);
+            mGridBox1Model = Matrix4.CreateTranslation(0, 0.20f, 0);
 
-            mGridBox2Model = Matrix4.CreateTranslation(0, 1.5f, -5f);
-            mGridBox2Model = Matrix4.CreateScale(3);
+            mGridBox2Model = Matrix4.CreateTranslation(0, -0.20f, 0);
 
-            mSphereOfDoomBoxModel = Matrix4.CreateTranslation(0, 0.75f, -5f);
-            mSphereOfDoomBoxModel = Matrix4.CreateScale(3);
+            mSphereOfDoomBoxModel = Matrix4.CreateTranslation(0, -0.60f, 0);
 
             #endregion
 
@@ -437,10 +433,9 @@ namespace Labs.ACW
 
             #region GridBox1
 
-
             Matrix4 m2 = mGridBox1Model * mWorld;
             uModel = GL.GetUniformLocation(mShader.ShaderProgramID, "uModel");
-            GL.UniformMatrix4(uModel, true, ref m1);
+            GL.UniformMatrix4(uModel, true, ref m2);
 
             Vector3 GridBox1AmbientReflectivity = new Vector3(0.2125f, 0.1275f, 0.054f);
             GL.Uniform3(uAmbientReflectivityLocation, GridBox1AmbientReflectivity);
@@ -461,10 +456,9 @@ namespace Labs.ACW
 
             #region GridBox2
 
-
             Matrix4 m3 = mGridBox2Model * mWorld;
             uModel = GL.GetUniformLocation(mShader.ShaderProgramID, "uModel");
-            GL.UniformMatrix4(uModel, true, ref m1);
+            GL.UniformMatrix4(uModel, true, ref m3);
 
             Vector3 GridBox2AmbientReflectivity = new Vector3(0.2125f, 0.1275f, 0.054f);
             GL.Uniform3(uAmbientReflectivityLocation, GridBox2AmbientReflectivity);
@@ -485,10 +479,9 @@ namespace Labs.ACW
 
             #region SphereOfDoomBox
 
-
             Matrix4 m4 = mSphereOfDoomBoxModel * mWorld;
             uModel = GL.GetUniformLocation(mShader.ShaderProgramID, "uModel");
-            GL.UniformMatrix4(uModel, true, ref m1);
+            GL.UniformMatrix4(uModel, true, ref m4);
 
             Vector3 SphereOfDoomBoxAmbientReflectivity = new Vector3(0.2125f, 0.1275f, 0.054f);
             GL.Uniform3(uAmbientReflectivityLocation, SphereOfDoomBoxAmbientReflectivity);

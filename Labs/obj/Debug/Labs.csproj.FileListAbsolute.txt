@@ -122,3 +122,6 @@ Z:\08214\Labs\bin\Debug\Labs.exe
 Z:\08214\Labs\bin\Debug\Labs.pdb
 Z:\08214\Labs\bin\Debug\OpenTK.dll
 Z:\08214\Labs\obj\Debug\Labs.csprojResolveAssemblyReference.cache
+C:\Users\Alex\Desktop\Programs\Coursework\08214\Labs\bin\Debug\ACW\Shaders\fLighting.frag
+C:\Users\Alex\Desktop\Programs\Coursework\08214\Labs\bin\Debug\ACW\Shaders\vPassThrough.vert
+C:\Users\Alex\Desktop\Programs\Coursework\08214\Labs\bin\Debug\Lab5\11884091_1000345359997175_3654872641334187195_o - Copy.jpg
