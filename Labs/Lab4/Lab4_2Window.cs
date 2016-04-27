@@ -153,6 +153,7 @@ namespace Labs.Lab4
         {
             float timestep = mTimer.GetElapsedSeconds();
 
+            mCircleVelocity = mCircleVelocity + accelerationDueToGravity * timestep;
             mCircleVelocity2 = mCircleVelocity2 + accelerationDueToGravity * timestep;
 
             Vector3 oldPosition = mCirclePosition;
@@ -198,8 +199,6 @@ namespace Labs.Lab4
             }
 
             mPreviousCirclePosition2 = mCirclePosition2;
-
-            mCircleVelocity = mCircleVelocity + accelerationDueToGravity * timestep;
 
             base.OnUpdateFrame(e);
         }
