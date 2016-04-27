@@ -14,7 +14,7 @@ namespace Labs.Lab4
         private Matrix4 mSquareMatrix;
         private Vector3 mCirclePosition, mCirclePosition2, mPreviousCirclePosition, mPreviousCirclePosition2;
         private Vector3 mCircleVelocity, mCircleVelocity2, accelerationDueToGravity;
-        private float mCircleRadius, mCircleRadius2;
+        private float mCircleRadius, mCircleRadius2, mSteelDensity;
         private Timer mTimer;
 
         public Lab4_2Window()
@@ -107,6 +107,7 @@ namespace Labs.Lab4
 
             mCircleRadius = 0.2f;
             mCircleRadius2 = 0.4f;
+            mSteelDensity = 7.8f;
             mCirclePosition = new Vector3(-2, 2, 0);
             mCirclePosition2 = new Vector3(2, -2, 0);
             mPreviousCirclePosition = new Vector3(2, 2, 0);
@@ -181,14 +182,21 @@ namespace Labs.Lab4
 
             if (Math.Sqrt(Math.Pow((mCirclePosition.X - mCirclePosition2.X), 2) + Math.Pow((mCirclePosition.Y - mCirclePosition2.Y), 2)) <= (mCircleRadius + mCircleRadius2))
             {
-                Vector3 N = (mCirclePosition2 - mCirclePosition).Normalized();
-                Vector3 velocity = mCircleVelocity - Vector3.Dot(mCircleVelocity, N) * N;
-                Vector3 velocity2 = Vector3.Dot(mCircleVelocity, N) * N;
-                Vector3 velocity3 = Vector3.Dot(mCircleVelocity2, -N) * -N;
-                Vector3 velocity4 = mCircleVelocity2 - Vector3.Dot(mCircleVelocity2, -N) * -N;
+                double circleMass1 = ((4 / 3) * Math.PI * Math.Pow(mCircleRadius, 3)) * mSteelDensity;
+                double circleMass2 = ((4 / 3) * Math.PI * Math.Pow(mCircleRadius2, 3)) * mSteelDensity;
 
-                mCircleVelocity = velocity + velocity3;
-                mCircleVelocity2 = velocity2 + velocity4;
+                double double1 = (circleMass1 - circleMass2) / (circleMass1 + circleMass2);
+                double double2 = (circleMass2 * 2) / (circleMass1 + circleMass2);
+
+                Vector3 velocity1 = Vector3.Multiply(mCircleVelocity, (float)double1) + Vector3.Multiply(mCircleVelocity2, (float)double2);
+
+                double double3 = (circleMass2 - circleMass1) / (circleMass2 + circleMass1);
+                double double4 = (circleMass1 * 2) / (circleMass2 + circleMass1);
+
+                Vector3 velocity2 = Vector3.Multiply(mCircleVelocity2, (float)double3) + Vector3.Multiply(mCircleVelocity, (float)double4);
+
+                mCircleVelocity = velocity1;
+                mCircleVelocity2 = velocity2;
 
                 mCirclePosition = mPreviousCirclePosition;
                 mCirclePosition2 = mPreviousCirclePosition2;
