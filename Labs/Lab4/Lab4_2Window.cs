@@ -106,13 +106,13 @@ namespace Labs.Lab4
             GL.UniformMatrix4(uViewLocation, true, ref m);
 
             mCircleRadius = 0.2f;
-            mCirclePosition = new Vector3(0, 2, 0);
-            mCirclePosition2 = new Vector3(0, 2, 0);
+            mCirclePosition = new Vector3(-2, 2, 0);
+            mCirclePosition2 = new Vector3(2, 2, 0);
             mPreviousCirclePosition = new Vector3(2, 2, 0);
             mPreviousCirclePosition2 = new Vector3(0, 2, 0);
             mCircleVelocity = new Vector3(2, 0, 0);
-            mCircleVelocity2 = new Vector3(2, 0, 0);
-            accelerationDueToGravity = new Vector3(0, -9.81f, 0);
+            mCircleVelocity2 = new Vector3(0, 0, 0);
+            accelerationDueToGravity = new Vector3(0, 0, 0);
             mSquareMatrix = Matrix4.CreateScale(4f) * Matrix4.CreateRotationZ(0.0f) * Matrix4.CreateTranslation(0, 0, 0);
 
             base.OnLoad(e);
