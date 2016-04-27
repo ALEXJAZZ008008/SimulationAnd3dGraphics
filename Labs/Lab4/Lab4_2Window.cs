@@ -13,7 +13,7 @@ namespace Labs.Lab4
         private ShaderUtility mShader;
         private Matrix4 mSquareMatrix;
         private Vector3 mCirclePosition, mPreviousCirclePosition;
-        private Vector3 mCircleVelocity;
+        private Vector3 mCircleVelocity, accelerationDueToGravity;
         private float mCircleRadius;
         private Timer mTimer;
 
@@ -96,6 +96,7 @@ namespace Labs.Lab4
             mCirclePosition = new Vector3(0, 2, 0);
             mPreviousCirclePosition = new Vector3(0, 2, 0);
             mCircleVelocity = new Vector3(2, 0, 0);
+            accelerationDueToGravity = new Vector3(0, -9.81f, 0);
             mSquareMatrix = Matrix4.CreateScale(4f) * Matrix4.CreateRotationZ(0.0f) * Matrix4.CreateTranslation(0, 0, 0);
 
             base.OnLoad(e);
@@ -157,6 +158,8 @@ namespace Labs.Lab4
             }
 
             mPreviousCirclePosition = mCirclePosition;
+
+            mCircleVelocity = mCircleVelocity + accelerationDueToGravity * timestep;
 
             base.OnUpdateFrame(e);
         }
