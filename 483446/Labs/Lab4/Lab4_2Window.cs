@@ -188,12 +188,14 @@ namespace Labs.Lab4
                 double double1 = (circleMass1 - circleMass2) / (circleMass1 + circleMass2);
                 double double2 = (circleMass2 * 2) / (circleMass1 + circleMass2);
 
-                Vector3 velocity1 = Vector3.Multiply(mCircleVelocity, (float)double1) + Vector3.Multiply(mCircleVelocity2, (float)double2);
+                float restitution = 1;
+
+                Vector3 velocity1 = Vector3.Divide((Vector3.Multiply(mCircleVelocity, (float)double1) + Vector3.Multiply(mCircleVelocity2, (float)double2) + Vector3.Multiply((mCircleVelocity2 - mCircleVelocity), Vector3.Multiply(mCircleVelocity2, restitution))), ((float)double1 + (float)double2));
 
                 double double3 = (circleMass2 - circleMass1) / (circleMass2 + circleMass1);
                 double double4 = (circleMass1 * 2) / (circleMass2 + circleMass1);
 
-                Vector3 velocity2 = Vector3.Multiply(mCircleVelocity2, (float)double3) + Vector3.Multiply(mCircleVelocity, (float)double4);
+                Vector3 velocity2 = Vector3.Divide((Vector3.Multiply(mCircleVelocity2, (float)double2) + Vector3.Multiply(mCircleVelocity, (float)double1) + Vector3.Multiply((mCircleVelocity - mCircleVelocity2), Vector3.Multiply(mCircleVelocity, restitution))), ((float)double2 + (float)double1));
 
                 mCircleVelocity = velocity1;
                 mCircleVelocity2 = velocity2;
