@@ -114,7 +114,7 @@ namespace Labs.Lab5
             if (System.IO.File.Exists(filepath))
             {
                 TextureBitmap = new Bitmap(filepath);
-
+                TextureBitmap.RotateFlip(RotateFlipType.RotateNoneFlipY);
                 TextureData = TextureBitmap.LockBits(new System.Drawing.Rectangle(0, 0, TextureBitmap.Width, TextureBitmap.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppRgb);
             }
             else
@@ -131,6 +131,9 @@ namespace Labs.Lab5
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
             TextureBitmap.UnlockBits(TextureData);
+
+            int uTextureSamplerLocation = GL.GetUniformLocation(mShader.ShaderProgramID, "uTextureSampler");
+            GL.Uniform1(uTextureSamplerLocation, 0);
 
             base.OnLoad(e);
 
