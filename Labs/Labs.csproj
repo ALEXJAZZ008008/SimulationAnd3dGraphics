@@ -121,6 +121,11 @@
     <Folder Include="ACW\Shaders\" />
     <Folder Include="Challenge\Shaders\" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="Lab5\11884091_1000345359997175_3654872641334187195_o - Copy.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

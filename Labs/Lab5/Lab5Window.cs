@@ -3,6 +3,8 @@ using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 using System;
+using System.Drawing;
+using System.Drawing.Imaging;
 
 namespace Labs.Lab5
 {
@@ -29,6 +31,17 @@ namespace Labs.Lab5
 
         protected override void OnLoad(EventArgs e)
         {
+            string filepath = @"Lab5/11884091_1000345359997175_3654872641334187195_o - Copy.jpg";
+            if (System.IO.File.Exists(filepath)) 
+            { 
+                Bitmap TextureBitmap = new Bitmap(filepath); 
+                BitmapData TextureData = TextureBitmap.LockBits(new System.Drawing.Rectangle(0, 0, TextureBitmap.Width, TextureBitmap.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppRgb);
+            } 
+            else 
+            { 
+                throw new Exception("Could not find file " + filepath);
+            }
+
             // Set some GL state
             GL.ClearColor(Color4.Firebrick);
 
