@@ -27,7 +27,7 @@ namespace Labs.ACW
         private int[] mVBO_IDs = new int[9];
         private int[] mVAO_IDs = new int[5];
         private ShaderUtility mShader;
-        private ModelUtility mBoxModelUtility;
+        private ModelUtility mEmitterBoxModelUtility, mGridBox1ModelUtility, mGridBox2ModelUtility, mSphereOfDoomBoxModelUtility;
         private Matrix4 mView, mEmitterBoxModel, mGridBox1Model, mGridBox2Model, mSphereOfDoomBoxModel, mWorld;
 
         protected override void OnLoad(EventArgs e)
@@ -98,29 +98,29 @@ namespace Labs.ACW
 
             GL.BindVertexArray(0);
 
-            mBoxModelUtility = ModelUtility.LoadModel(@"Utility/Models/lab22model.sjg");
+            mEmitterBoxModelUtility = ModelUtility.LoadModel(@"Utility/Models/lab22model.sjg");
 
             GL.BindVertexArray(mVAO_IDs[1]);
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, mVBO_IDs[1]);
-            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(mBoxModelUtility.Vertices.Length * sizeof(float)), mBoxModelUtility.Vertices, BufferUsageHint.StaticDraw);
+            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(mEmitterBoxModelUtility.Vertices.Length * sizeof(float)), mEmitterBoxModelUtility.Vertices, BufferUsageHint.StaticDraw);
 
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, mVBO_IDs[2]);
-            GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(mBoxModelUtility.Indices.Length * sizeof(float)), mBoxModelUtility.Indices, BufferUsageHint.StaticDraw);
+            GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(mEmitterBoxModelUtility.Indices.Length * sizeof(float)), mEmitterBoxModelUtility.Indices, BufferUsageHint.StaticDraw);
 
             GL.EnableVertexAttribArray(vNormalLocation);
             GL.VertexAttribPointer(vNormalLocation, 3, VertexAttribPointerType.Float, true, 6 * sizeof(float), 3 * sizeof(float));
 
             GL.GetBufferParameter(BufferTarget.ArrayBuffer, BufferParameterName.BufferSize, out size);
 
-            if (mBoxModelUtility.Vertices.Length * sizeof(float) != size)
+            if (mEmitterBoxModelUtility.Vertices.Length * sizeof(float) != size)
             {
                 throw new ApplicationException("Vertex data not loaded onto graphics card correctly");
             }
 
             GL.GetBufferParameter(BufferTarget.ElementArrayBuffer, BufferParameterName.BufferSize, out size);
 
-            if (mBoxModelUtility.Indices.Length * sizeof(float) != size)
+            if (mEmitterBoxModelUtility.Indices.Length * sizeof(float) != size)
             {
                 throw new ApplicationException("Index data not loaded onto graphics card correctly");
             }
@@ -134,29 +134,29 @@ namespace Labs.ACW
 
             GL.BindVertexArray(0);
 
-            mBoxModelUtility = ModelUtility.LoadModel(@"Utility/Models/lab22model.sjg");
+            mGridBox1ModelUtility = ModelUtility.LoadModel(@"Utility/Models/lab22model.sjg");
 
             GL.BindVertexArray(mVAO_IDs[2]);
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, mVBO_IDs[3]);
-            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(mBoxModelUtility.Vertices.Length * sizeof(float)), mBoxModelUtility.Vertices, BufferUsageHint.StaticDraw);
+            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(mGridBox1ModelUtility.Vertices.Length * sizeof(float)), mGridBox1ModelUtility.Vertices, BufferUsageHint.StaticDraw);
 
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, mVBO_IDs[4]);
-            GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(mBoxModelUtility.Indices.Length * sizeof(float)), mBoxModelUtility.Indices, BufferUsageHint.StaticDraw);
+            GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(mGridBox1ModelUtility.Indices.Length * sizeof(float)), mGridBox1ModelUtility.Indices, BufferUsageHint.StaticDraw);
 
             GL.EnableVertexAttribArray(vNormalLocation);
             GL.VertexAttribPointer(vNormalLocation, 3, VertexAttribPointerType.Float, true, 6 * sizeof(float), 3 * sizeof(float));
 
             GL.GetBufferParameter(BufferTarget.ArrayBuffer, BufferParameterName.BufferSize, out size);
 
-            if (mBoxModelUtility.Vertices.Length * sizeof(float) != size)
+            if (mGridBox1ModelUtility.Vertices.Length * sizeof(float) != size)
             {
                 throw new ApplicationException("Vertex data not loaded onto graphics card correctly");
             }
 
             GL.GetBufferParameter(BufferTarget.ElementArrayBuffer, BufferParameterName.BufferSize, out size);
 
-            if (mBoxModelUtility.Indices.Length * sizeof(float) != size)
+            if (mGridBox1ModelUtility.Indices.Length * sizeof(float) != size)
             {
                 throw new ApplicationException("Index data not loaded onto graphics card correctly");
             }
@@ -170,29 +170,29 @@ namespace Labs.ACW
 
             GL.BindVertexArray(0);
 
-            mBoxModelUtility = ModelUtility.LoadModel(@"Utility/Models/lab22model.sjg");
+            mGridBox2ModelUtility = ModelUtility.LoadModel(@"Utility/Models/lab22model.sjg");
 
             GL.BindVertexArray(mVAO_IDs[3]);
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, mVBO_IDs[5]);
-            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(mBoxModelUtility.Vertices.Length * sizeof(float)), mBoxModelUtility.Vertices, BufferUsageHint.StaticDraw);
+            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(mGridBox2ModelUtility.Vertices.Length * sizeof(float)), mGridBox2ModelUtility.Vertices, BufferUsageHint.StaticDraw);
 
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, mVBO_IDs[6]);
-            GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(mBoxModelUtility.Indices.Length * sizeof(float)), mBoxModelUtility.Indices, BufferUsageHint.StaticDraw);
+            GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(mGridBox2ModelUtility.Indices.Length * sizeof(float)), mGridBox2ModelUtility.Indices, BufferUsageHint.StaticDraw);
 
             GL.EnableVertexAttribArray(vNormalLocation);
             GL.VertexAttribPointer(vNormalLocation, 3, VertexAttribPointerType.Float, true, 6 * sizeof(float), 3 * sizeof(float));
 
             GL.GetBufferParameter(BufferTarget.ArrayBuffer, BufferParameterName.BufferSize, out size);
 
-            if (mBoxModelUtility.Vertices.Length * sizeof(float) != size)
+            if (mGridBox2ModelUtility.Vertices.Length * sizeof(float) != size)
             {
                 throw new ApplicationException("Vertex data not loaded onto graphics card correctly");
             }
 
             GL.GetBufferParameter(BufferTarget.ElementArrayBuffer, BufferParameterName.BufferSize, out size);
 
-            if (mBoxModelUtility.Indices.Length * sizeof(float) != size)
+            if (mGridBox2ModelUtility.Indices.Length * sizeof(float) != size)
             {
                 throw new ApplicationException("Index data not loaded onto graphics card correctly");
             }
@@ -206,29 +206,29 @@ namespace Labs.ACW
 
             GL.BindVertexArray(0);
 
-            mBoxModelUtility = ModelUtility.LoadModel(@"Utility/Models/lab22model.sjg");
+            mSphereOfDoomBoxModelUtility = ModelUtility.LoadModel(@"Utility/Models/lab22model.sjg");
 
             GL.BindVertexArray(mVAO_IDs[4]);
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, mVBO_IDs[7]);
-            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(mBoxModelUtility.Vertices.Length * sizeof(float)), mBoxModelUtility.Vertices, BufferUsageHint.StaticDraw);
+            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(mSphereOfDoomBoxModelUtility.Vertices.Length * sizeof(float)), mSphereOfDoomBoxModelUtility.Vertices, BufferUsageHint.StaticDraw);
 
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, mVBO_IDs[8]);
-            GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(mBoxModelUtility.Indices.Length * sizeof(float)), mBoxModelUtility.Indices, BufferUsageHint.StaticDraw);
+            GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(mSphereOfDoomBoxModelUtility.Indices.Length * sizeof(float)), mSphereOfDoomBoxModelUtility.Indices, BufferUsageHint.StaticDraw);
 
             GL.EnableVertexAttribArray(vNormalLocation);
             GL.VertexAttribPointer(vNormalLocation, 3, VertexAttribPointerType.Float, true, 6 * sizeof(float), 3 * sizeof(float));
 
             GL.GetBufferParameter(BufferTarget.ArrayBuffer, BufferParameterName.BufferSize, out size);
 
-            if (mBoxModelUtility.Vertices.Length * sizeof(float) != size)
+            if (mSphereOfDoomBoxModelUtility.Vertices.Length * sizeof(float) != size)
             {
                 throw new ApplicationException("Vertex data not loaded onto graphics card correctly");
             }
 
             GL.GetBufferParameter(BufferTarget.ElementArrayBuffer, BufferParameterName.BufferSize, out size);
 
-            if (mBoxModelUtility.Indices.Length * sizeof(float) != size)
+            if (mSphereOfDoomBoxModelUtility.Indices.Length * sizeof(float) != size)
             {
                 throw new ApplicationException("Index data not loaded onto graphics card correctly");
             }
@@ -245,16 +245,16 @@ namespace Labs.ACW
 
             mWorld = Matrix4.CreateTranslation(0, 1.5f, -5f);
 
-            mEmitterBoxModel = Matrix4.CreateTranslation(0, 1.5f, -5f);
+            mEmitterBoxModel = Matrix4.CreateTranslation(0, 3f, -5f);
             mEmitterBoxModel = Matrix4.CreateScale(3);
 
-            mGridBox1Model = Matrix4.CreateTranslation(0, 0.75f, -5f);
+            mGridBox1Model = Matrix4.CreateTranslation(0, 2.25f, -5f);
             mGridBox1Model = Matrix4.CreateScale(3);
 
-            mGridBox2Model = Matrix4.CreateTranslation(0, -0.75f, -5f);
+            mGridBox2Model = Matrix4.CreateTranslation(0, 1.5f, -5f);
             mGridBox2Model = Matrix4.CreateScale(3);
 
-            mSphereOfDoomBoxModel = Matrix4.CreateTranslation(0, -1.5f, -5f);
+            mSphereOfDoomBoxModel = Matrix4.CreateTranslation(0, 0.75f, -5f);
             mSphereOfDoomBoxModel = Matrix4.CreateScale(3);
 
             #endregion
@@ -431,7 +431,7 @@ namespace Labs.ACW
             GL.Uniform1(uShininessLocation, emitterBoxShininess);
 
             GL.BindVertexArray(mVAO_IDs[1]);
-            GL.DrawElements(PrimitiveType.Triangles, mBoxModelUtility.Indices.Length, DrawElementsType.UnsignedInt, 0);
+            GL.DrawElements(PrimitiveType.Triangles, mEmitterBoxModelUtility.Indices.Length, DrawElementsType.UnsignedInt, 0);
 
             #endregion
 
@@ -455,7 +455,7 @@ namespace Labs.ACW
             GL.Uniform1(uShininessLocation, GridBox1Shininess);
 
             GL.BindVertexArray(mVAO_IDs[2]);
-            GL.DrawElements(PrimitiveType.Triangles, mBoxModelUtility.Indices.Length, DrawElementsType.UnsignedInt, 0);
+            GL.DrawElements(PrimitiveType.Triangles, mGridBox1ModelUtility.Indices.Length, DrawElementsType.UnsignedInt, 0);
 
             #endregion
 
@@ -479,7 +479,7 @@ namespace Labs.ACW
             GL.Uniform1(uShininessLocation, GridBox2Shininess);
 
             GL.BindVertexArray(mVAO_IDs[3]);
-            GL.DrawElements(PrimitiveType.Triangles, mBoxModelUtility.Indices.Length, DrawElementsType.UnsignedInt, 0);
+            GL.DrawElements(PrimitiveType.Triangles, mGridBox2ModelUtility.Indices.Length, DrawElementsType.UnsignedInt, 0);
 
             #endregion
 
@@ -503,7 +503,7 @@ namespace Labs.ACW
             GL.Uniform1(uShininessLocation, SphereOfDoomBoxShininess);
 
             GL.BindVertexArray(mVAO_IDs[4]);
-            GL.DrawElements(PrimitiveType.Triangles, mBoxModelUtility.Indices.Length, DrawElementsType.UnsignedInt, 0);
+            GL.DrawElements(PrimitiveType.Triangles, mSphereOfDoomBoxModelUtility.Indices.Length, DrawElementsType.UnsignedInt, 0);
 
             #endregion
 
