@@ -106,7 +106,7 @@ namespace Labs.Lab4
             GL.UniformMatrix4(uViewLocation, true, ref m);
 
             mCircleRadius = 0.2f;
-            mCirclePosition = new Vector3(-2, 2, 0);
+            mCirclePosition = new Vector3(-2, 2.3f, 0);
             mCirclePosition2 = new Vector3(2, 2, 0);
             mPreviousCirclePosition = new Vector3(2, 2, 0);
             mPreviousCirclePosition2 = new Vector3(0, 2, 0);
@@ -180,9 +180,10 @@ namespace Labs.Lab4
 
             if (Math.Sqrt(Math.Pow((mCirclePosition.X - mCirclePosition2.X), 2) + Math.Pow((mCirclePosition.Y - mCirclePosition2.Y), 2)) <= (mCircleRadius + mCircleRadius))
             {
-                Vector3 temp = mCircleVelocity;
-                mCircleVelocity = mCircleVelocity2;
-                mCircleVelocity2 = temp;
+                Vector3 N = (mCirclePosition2 - mCirclePosition).Normalized();
+                Vector3 velocity = mCircleVelocity - Vector3.Dot(mCircleVelocity, N) * N;
+                mCircleVelocity2 = Vector3.Dot(mCircleVelocity, N) * N;
+                mCircleVelocity = velocity;
 
                 mCirclePosition = mPreviousCirclePosition;
                 mCirclePosition2 = mPreviousCirclePosition2;
