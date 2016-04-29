@@ -58,7 +58,7 @@ namespace Labs.ACW
 
         private ShaderUtility mShader;
         private ModelUtility mEmitterBoxModelUtility, mGridBox1ModelUtility, mGridBox2ModelUtility, mSphereOfDoomBoxModelUtility, mSphereOfDoomModelUtility, mCylinderModelUtility, mSphereModelUtility;
-        private Matrix4 mView, mEmitterBoxModel, mGridBox1Model, mGridBox2Model, mSphereOfDoomBoxModel, mWorld;
+        private Matrix4 mView, mEmitterBoxModel, mGridBox1Model, mGridBox2Model, mSphereOfDoomBoxModel, mWorld, mWorld2;
         private int mTexture_ID;
 
         private Sphere sphereOfDoom = new Sphere();
@@ -71,7 +71,7 @@ namespace Labs.ACW
         private int randomBall;
 
         private Timer mTimer;
-        private bool onResizeBool;
+        private bool onResizeBool, simulationBool, speedBool;
         private float accelerationDueToGravity, coefficientOfRestitution, ellapsedTime, randomEllapsedTime;
 
         #endregion
@@ -114,7 +114,7 @@ namespace Labs.ACW
                 sphereItem.mSpherePosition = new Vector3(sphereItem.mSpherePosition.X, sphereItem.mSpherePosition.Y, sphereItem.mSpherePosition.Z + sphereItem.mSphereRadius);
             }
 
-            sphereItem.mSphereVelocity = new Vector3(random.Next(-100, 101), random.Next(-1000, 1001), random.Next(-1000, 1001));
+            sphereItem.mSphereVelocity = new Vector3(random.Next(-1000, 1001), random.Next(-1000, 1001), random.Next(-1000, 1001));
             sphereItem.mSphereVelocity = new Vector3(sphereItem.mSphereVelocity.X / 1000, (sphereItem.mSphereVelocity.Y / 1000) + 0.6f, sphereItem.mSphereVelocity.Z / 1000);
 
             return sphereItem;
@@ -498,7 +498,7 @@ namespace Labs.ACW
             GL.Uniform3(uSpecularLightLocation2, colour2);
 
             #endregion
-            
+
             accelerationDueToGravity = -9.81f;
             coefficientOfRestitution = 0.75f;
 
@@ -587,6 +587,10 @@ namespace Labs.ACW
             #endregion
 
             onResizeBool = false;
+            simulationBool = true;
+            speedBool = false;
+
+            mWorld2 = mWorld;
 
             mTimer = new Timer();
             mTimer.Start();
@@ -662,24 +666,52 @@ namespace Labs.ACW
 
             if (e.KeyChar == '1')
             {
+                mWorld = mWorld2;
                 camera = Camera.Static;
             }
 
             if (e.KeyChar == '2')
             {
+                mWorld = mWorld2;
                 camera = Camera.User;
             }
 
             if (e.KeyChar == '3')
             {
+                mWorld = mWorld2;
                 camera = Camera.Moving;
             }
 
             if (e.KeyChar == '4')
             {
+                mWorld = mWorld2;
                 randomBall = random.Next(0, (sphereList.Count + 1));
 
                 camera = Camera.Follow;
+            }
+
+            if (e.KeyChar == 'x')
+            {
+                if (simulationBool)
+                {
+                    simulationBool = false;
+                }
+                else
+                {
+                    simulationBool = true;
+                }
+            }
+
+            if (e.KeyChar == 'q')
+            {
+                if (speedBool)
+                {
+                    speedBool = false;
+                }
+                else
+                {
+                    speedBool = true;
+                }
             }
 
             base.OnKeyPress(e);
@@ -713,7 +745,14 @@ namespace Labs.ACW
 
             if (camera == Camera.Follow)
             {
-                mWorld = Matrix4.CreateTranslation(sphereList[randomBall].mSpherePosition);
+                try
+                {
+                    mWorld = mWorld * Matrix4.CreateTranslation(-(sphereList[randomBall].mSphereVelocity * (float)0.02));
+                }
+                catch
+                {
+
+                }
             }
 
             if(onResizeBool)
@@ -729,7 +768,17 @@ namespace Labs.ACW
 
             for (int i = 0; i < sphereList.Count; i++)
             {
-                sphereList[i].mSphereVelocity.Y = sphereList[i].mSphereVelocity.Y + accelerationDueToGravity * timestep;
+                if (simulationBool)
+                {
+                    if (speedBool)
+                    {
+                        sphereList[i].mSphereVelocity.Y = (sphereList[i].mSphereVelocity.Y + accelerationDueToGravity * timestep) / 2;
+                    }
+                    else
+                    {
+                        sphereList[i].mSphereVelocity.Y = sphereList[i].mSphereVelocity.Y + accelerationDueToGravity * timestep;
+                    }
+                }
 
                 Vector3 mPreviousSpherePosition = sphereList[i].mSpherePosition;
 
@@ -739,12 +788,12 @@ namespace Labs.ACW
 
                 for (int j = 0; j < i; j++)
                 {
-                    if (j != i && (Math.Sqrt(Math.Pow((sphereList[j].mSpherePosition.X - sphereList[i].mSpherePosition.X), 2) + Math.Pow((sphereList[j].mSpherePosition.Y - sphereList[i].mSpherePosition.Y), 2) + Math.Pow((sphereList[j].mSpherePosition.Z - sphereList[i].mSpherePosition.Z), 2)) <= (sphereList[j].mSphereRadius + sphereList[i].mSphereRadius)))
+                    if (j != i && (Math.Sqrt(Math.Pow((sphereList[i].mSpherePosition.X - sphereList[j].mSpherePosition.X), 2) + Math.Pow((sphereList[i].mSpherePosition.Y - sphereList[j].mSpherePosition.Y), 2) + Math.Pow((sphereList[i].mSpherePosition.Z - sphereList[j].mSpherePosition.Z), 2)) <= (sphereList[i].mSphereRadius + sphereList[j].mSphereRadius)))
                     {
-                        Vector3 temporaryVelocity = sphereList[j].mSphereVelocity;
+                        Vector3 temporaryVelocity = sphereList[i].mSphereVelocity;
 
-                        sphereList[j].mSphereVelocity = (Vector3.Multiply(sphereList[i].mSphereVelocity, (sphereList[j].mSphereMass - sphereList[i].mSphereMass) / (sphereList[j].mSphereMass + sphereList[i].mSphereMass)) + Vector3.Multiply(sphereList[j].mSphereVelocity, (sphereList[i].mSphereMass * 2) / (sphereList[j].mSphereMass + sphereList[i].mSphereMass))) * coefficientOfRestitution;
                         sphereList[i].mSphereVelocity = (Vector3.Multiply(temporaryVelocity, (sphereList[i].mSphereMass - sphereList[j].mSphereMass) / (sphereList[i].mSphereMass + sphereList[j].mSphereMass)) + Vector3.Multiply(sphereList[i].mSphereVelocity, (sphereList[j].mSphereMass * 2) / (sphereList[i].mSphereMass + sphereList[j].mSphereMass))) * coefficientOfRestitution;
+                        sphereList[j].mSphereVelocity = (Vector3.Multiply(sphereList[i].mSphereVelocity, (sphereList[j].mSphereMass - sphereList[i].mSphereMass) / (sphereList[j].mSphereMass + sphereList[i].mSphereMass)) + Vector3.Multiply(sphereList[j].mSphereVelocity, (sphereList[i].mSphereMass * 2) / (sphereList[j].mSphereMass + sphereList[i].mSphereMass))) * coefficientOfRestitution;
 
                         sphereList[i].mSpherePosition = mPreviousSpherePosition;
                     }
@@ -756,32 +805,41 @@ namespace Labs.ACW
 
                 for (int j = 0; j < cylinderArray.Length; j++)
                 {
-                    /*
-                    if (Math.Sqrt(Math.Pow((cylinderArray[j].mCylinderPosition.Y - sphereList[i].mSpherePosition.Y), 2)) <= (cylinderArray[j].mCylinderRadius + sphereList[i].mSphereRadius) && (sphereList[i].mSpherePosition.Z >= cylinderArray[j].mCylinderPosition.Z + cylinderArray[j].mCylinderRadius && sphereList[i].mSpherePosition.Z <= cylinderArray[j].mCylinderPosition.Z - cylinderArray[j].mCylinderRadius))
-                    {
-                        Vector3 N = (cylinderArray[j].mCylinderPosition - sphereList[i].mSpherePosition).Normalized();
 
-                        sphereList[i].mSphereVelocity = sphereList[i].mSphereVelocity - Vector3.Dot(sphereList[i].mSphereVelocity, N) * N;
-
-                        sphereList[i].mSpherePosition = mPreviousSpherePosition;
-                    }
-                    */
                 }
 
                 #endregion
 
                 #region SphereOfDoomCollide
 
-                if (Math.Sqrt(Math.Pow((sphereOfDoom.mSpherePosition.X - sphereList[i].mSpherePosition.X), 2) + Math.Pow((sphereOfDoom.mSpherePosition.Y - sphereList[i].mSpherePosition.Y), 2) + Math.Pow((sphereOfDoom.mSpherePosition.Z - sphereList[i].mSpherePosition.Z), 2)) <= (sphereOfDoom.mSphereRadius + sphereList[i].mSphereRadius))
+                int uLightPositionLocation4 = GL.GetUniformLocation(mShader.ShaderProgramID, "uLight[2].Position");
+                int uAmbientLightLocation4 = GL.GetUniformLocation(mShader.ShaderProgramID, "uLight[2].AmbientLight");
+                int uDiffuseLightLocation4 = GL.GetUniformLocation(mShader.ShaderProgramID, "uLight[2].DiffuseLight");
+                int uSpecularLightLocation4 = GL.GetUniformLocation(mShader.ShaderProgramID, "uLight[2].SpecularLight");
+
+                if (Math.Sqrt(Math.Pow((sphereList[i].mSpherePosition.X - sphereOfDoom.mSpherePosition.X), 2) + Math.Pow((sphereList[i].mSpherePosition.Y - sphereOfDoom.mSpherePosition.Y), 2) + Math.Pow((sphereList[i].mSpherePosition.Z - sphereOfDoom.mSpherePosition.Z), 2)) <= (sphereList[i].mSphereRadius + sphereOfDoom.mSphereRadius))
                 {
-                    
+                    Vector4 lightPosition2 = Vector4.Transform(new Vector4(sphereList[i].mSpherePosition, 1), mView);
+                    GL.Uniform4(uLightPositionLocation4, lightPosition2);
+
+                    Vector3 colour4 = new Vector3(1, 0, 0);
+                    GL.Uniform3(uAmbientLightLocation4, colour4);
+                    GL.Uniform3(uDiffuseLightLocation4, colour4);
+                    GL.Uniform3(uSpecularLightLocation4, colour4);
+                }
+                else
+                {
+                    Vector3 colour4 = new Vector3(0, 0, 0);
+                    GL.Uniform3(uAmbientLightLocation4, colour4);
+                    GL.Uniform3(uDiffuseLightLocation4, colour4);
+                    GL.Uniform3(uSpecularLightLocation4, colour4);
                 }
 
                 #endregion
 
                 #region WallCollide
 
-                if ((sphereList[i].mSpherePosition.X + (sphereList[i].mSphereRadius / mEmitterBoxModel.ExtractScale().X)) >= 0.2 || (sphereList[i].mSpherePosition.X - (sphereList[i].mSphereRadius / mEmitterBoxModel.ExtractScale().X)) <= -0.2)
+                if (sphereList[i].mSpherePosition.X + sphereList[i].mSphereRadius >= 0.2 || sphereList[i].mSpherePosition.X - sphereList[i].mSphereRadius <= -0.2)
                 {
                     Vector3 normal = new Vector3(-1, 0, 0);
                     sphereList[i].mSphereVelocity = (sphereList[i].mSphereVelocity - 2 * Vector3.Dot(normal, sphereList[i].mSphereVelocity) * normal) * coefficientOfRestitution;
@@ -789,7 +847,7 @@ namespace Labs.ACW
                     sphereList[i].mSpherePosition = mPreviousSpherePosition;
                 }
 
-                if ((sphereList[i].mSpherePosition.Y + (sphereList[i].mSphereRadius / mEmitterBoxModel.ExtractScale().Y)) <= -0.8)
+                if (sphereList[i].mSpherePosition.Y + sphereList[i].mSphereRadius <= -0.8)
                 {
                     Vector3 temporaryPosition = sphereList[i].mSpherePosition;
                     Vector3 temporaryVelocity = sphereList[i].mSphereVelocity;
@@ -801,7 +859,7 @@ namespace Labs.ACW
                     sphereList[i].mSpherePosition.X = 0.2f - sphereList[i].mSphereRadius;
                 }
 
-                if ((sphereList[i].mSpherePosition.Y - (sphereList[i].mSphereRadius / mEmitterBoxModel.ExtractScale().Y)) >= 0.8)
+                if (sphereList[i].mSpherePosition.Y - sphereList[i].mSphereRadius >= 0.8)
                 {
                     Vector3 normal = new Vector3(0, -1, 0);
                     sphereList[i].mSphereVelocity = (sphereList[i].mSphereVelocity - 2 * Vector3.Dot(normal, sphereList[i].mSphereVelocity) * normal) * coefficientOfRestitution;
@@ -809,7 +867,7 @@ namespace Labs.ACW
                     sphereList[i].mSpherePosition = mPreviousSpherePosition;
                 }
 
-                if ((sphereList[i].mSpherePosition.Z + (sphereList[i].mSphereRadius / mEmitterBoxModel.ExtractScale().Z)) >= 0.2 || (sphereList[i].mSpherePosition.Z - (sphereList[i].mSphereRadius / mEmitterBoxModel.ExtractScale().Z)) <= -0.2)
+                if (sphereList[i].mSpherePosition.Z + sphereList[i].mSphereRadius >= 0.2 || sphereList[i].mSpherePosition.Z - sphereList[i].mSphereRadius <= -0.2)
                 {
                     Vector3 normal = new Vector3(0, 0, -1);
                     sphereList[i].mSphereVelocity = (sphereList[i].mSphereVelocity - 2 * Vector3.Dot(normal, sphereList[i].mSphereVelocity) * normal) * coefficientOfRestitution;
@@ -818,13 +876,23 @@ namespace Labs.ACW
                 }
 
                 #endregion
+
+                if (!simulationBool)
+                {
+                    if (speedBool)
+                    {
+                        sphereList[i].mSphereVelocity.Y = (sphereList[i].mSphereVelocity.Y + accelerationDueToGravity * timestep) / 2;
+                    }
+                    else
+                    {
+                        sphereList[i].mSphereVelocity.Y = sphereList[i].mSphereVelocity.Y + accelerationDueToGravity * timestep;
+                    }
+                }
             }
 
             if (ellapsedTime > randomEllapsedTime)
             {
                 AddToList();
-
-                Console.WriteLine(sphereList.Count);
 
                 ellapsedTime = 0;
                 randomEllapsedTime = random.Next(0, 1001);
@@ -846,22 +914,7 @@ namespace Labs.ACW
 
             #region World
 
-            GL.UniformMatrix4(uModel, true, ref mWorld);
 
-            Vector3 worldAmbientReflectivity = new Vector3(0, 0, 0);
-            GL.Uniform3(uAmbientReflectivityLocation, worldAmbientReflectivity);
-
-            Vector3 worldDiffuseReflectivity = new Vector3(0, 0, 0);
-            GL.Uniform3(uDiffuseReflectivityLocation, worldDiffuseReflectivity);
-
-            Vector3 worldSpecularReflectivity = new Vector3(0, 0, 0);
-            GL.Uniform3(uSpecularReflectivityLocation, worldSpecularReflectivity);
-
-            float worldShininess = 0f;
-            GL.Uniform1(uShininessLocation, worldShininess);
-
-            GL.BindVertexArray(mVAO_IDs[0]);
-            GL.DrawArrays(PrimitiveType.TriangleFan, 0, 4);
 
             #endregion
 
