@@ -128,3 +128,6 @@ Z:\08214\Labs\bin\Debug\Utility\Models\BottomBox.sjg
 Z:\08214\Labs\bin\Debug\Utility\Models\TopBox.sjg
 Z:\08214\Labs\bin\Debug\ACW\Shaders\fLighting.frag
 Z:\08214\Labs\bin\Debug\ACW\Shaders\vPassThrough.vert
+Z:\08214\Labs\bin\Debug\ACW\Shaders\fLighting2.frag
+Z:\08214\Labs\bin\Debug\ACW\Shaders\vPassThrough2.vert
+Z:\08214\Labs\bin\Debug\ACW\MaxResDefault.jpg

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Imaging;
 using Labs.Utility;
 using Labs.Lab4;
 using OpenTK;
@@ -8,6 +10,14 @@ using OpenTK.Graphics.OpenGL;
 
 namespace Labs.ACW
 {
+    public class Cylinder
+    {
+        public Vector3 mCylinderPosition, mCylinderRotation, mCylinderScale;
+
+
+        public float mCylinderRadius;
+    }
+
     public class Sphere
     {
         public Vector3 mSpherePosition, mSphereVelocity;
@@ -33,18 +43,38 @@ namespace Labs.ACW
 
         }
 
-        private int[] mVBO_IDs = new int[11];
-        private int[] mVAO_IDs = new int[6];
+        #region Variables
+
+        enum Camera
+        {
+            Static,
+            User,
+            Moving,
+            Follow
+        }
+
+        private int[] mVBO_IDs = new int[15];
+        private int[] mVAO_IDs = new int[8];
 
         private ShaderUtility mShader;
-        private ModelUtility mEmitterBoxModelUtility, mGridBox1ModelUtility, mGridBox2ModelUtility, mSphereOfDoomBoxModelUtility, mSphereModelUtility;
+        private ModelUtility mEmitterBoxModelUtility, mGridBox1ModelUtility, mGridBox2ModelUtility, mSphereOfDoomBoxModelUtility, mSphereOfDoomModelUtility, mCylinderModelUtility, mSphereModelUtility;
         private Matrix4 mView, mEmitterBoxModel, mGridBox1Model, mGridBox2Model, mSphereOfDoomBoxModel, mWorld;
+        private int mTexture_ID;
 
-        private Timer mTimer;
-        private float accelerationDueToGravity, coefficientOfRestitution, ellapsedTime, randomEllapsedTime;
+        private Sphere sphereOfDoom = new Sphere();
+        private Cylinder[] cylinderArray = new Cylinder[6];
+        private List<Sphere> sphereList = new List<Sphere>();
 
         private Random random = new Random();
-        private List<Sphere> sphereList = new List<Sphere>();
+
+        Camera camera;
+        private int randomBall;
+
+        private Timer mTimer;
+        private bool onResizeBool;
+        private float accelerationDueToGravity, coefficientOfRestitution, ellapsedTime, randomEllapsedTime;
+
+        #endregion
 
         Sphere CreateSphereItem()
         {
@@ -58,9 +88,9 @@ namespace Labs.ACW
             }
             else
             {
-                sphereItem.mSphereRadius = (float)(0.2 / (100 / 14));
+                sphereItem.mSphereRadius = 0.028f;
 
-                sphereItem.mSphereRadius = (float)(0.0014f * ((4 / 3) * Math.PI * Math.Pow(sphereItem.mSphereRadius, 3)));
+                sphereItem.mSphereMass = (float)(0.0014f * ((4 / 3) * Math.PI * Math.Pow(sphereItem.mSphereRadius, 3)));
             }
 
             sphereItem.mSpherePosition = new Vector3(random.Next(-200, 200), random.Next(-200, 200), random.Next(-200, 200));
@@ -311,16 +341,88 @@ namespace Labs.ACW
 
             #endregion
 
-            #region Sphere
+            #region SphereOfDoom
 
-            mSphereModelUtility = ModelUtility.LoadModel(@"Utility/Models/Sphere.bin");
+            mSphereOfDoomModelUtility = ModelUtility.LoadModel(@"Utility/Models/Sphere.bin");
 
             GL.BindVertexArray(mVAO_IDs[5]);
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, mVBO_IDs[9]);
-            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(mSphereModelUtility.Vertices.Length * sizeof(float)), mSphereModelUtility.Vertices, BufferUsageHint.StaticDraw);
+            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(mSphereOfDoomModelUtility.Vertices.Length * sizeof(float)), mSphereOfDoomModelUtility.Vertices, BufferUsageHint.StaticDraw);
 
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, mVBO_IDs[10]);
+            GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(mSphereOfDoomModelUtility.Indices.Length * sizeof(float)), mSphereOfDoomModelUtility.Indices, BufferUsageHint.StaticDraw);
+
+            GL.EnableVertexAttribArray(vNormalLocation);
+            GL.VertexAttribPointer(vNormalLocation, 3, VertexAttribPointerType.Float, true, 6 * sizeof(float), 3 * sizeof(float));
+
+            GL.GetBufferParameter(BufferTarget.ArrayBuffer, BufferParameterName.BufferSize, out size);
+
+            if (mSphereOfDoomModelUtility.Vertices.Length * sizeof(float) != size)
+            {
+                throw new ApplicationException("Vertex data not loaded onto graphics card correctly");
+            }
+
+            GL.GetBufferParameter(BufferTarget.ElementArrayBuffer, BufferParameterName.BufferSize, out size);
+
+            if (mSphereOfDoomModelUtility.Indices.Length * sizeof(float) != size)
+            {
+                throw new ApplicationException("Index data not loaded onto graphics card correctly");
+            }
+
+            GL.EnableVertexAttribArray(vPositionLocation);
+            GL.VertexAttribPointer(vPositionLocation, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 0);
+
+            GL.BindVertexArray(0);
+
+            #endregion
+
+            #region Cylinder
+
+            mCylinderModelUtility = ModelUtility.LoadModel(@"Utility/Models/Cylinder.bin");
+
+            GL.BindVertexArray(mVAO_IDs[6]);
+
+            GL.BindBuffer(BufferTarget.ArrayBuffer, mVBO_IDs[11]);
+            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(mCylinderModelUtility.Vertices.Length * sizeof(float)), mCylinderModelUtility.Vertices, BufferUsageHint.StaticDraw);
+
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, mVBO_IDs[12]);
+            GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(mCylinderModelUtility.Indices.Length * sizeof(float)), mCylinderModelUtility.Indices, BufferUsageHint.StaticDraw);
+
+            GL.EnableVertexAttribArray(vNormalLocation);
+            GL.VertexAttribPointer(vNormalLocation, 3, VertexAttribPointerType.Float, true, 6 * sizeof(float), 3 * sizeof(float));
+
+            GL.GetBufferParameter(BufferTarget.ArrayBuffer, BufferParameterName.BufferSize, out size);
+
+            if (mCylinderModelUtility.Vertices.Length * sizeof(float) != size)
+            {
+                throw new ApplicationException("Vertex data not loaded onto graphics card correctly");
+            }
+
+            GL.GetBufferParameter(BufferTarget.ElementArrayBuffer, BufferParameterName.BufferSize, out size);
+
+            if (mCylinderModelUtility.Indices.Length * sizeof(float) != size)
+            {
+                throw new ApplicationException("Index data not loaded onto graphics card correctly");
+            }
+
+            GL.EnableVertexAttribArray(vPositionLocation);
+            GL.VertexAttribPointer(vPositionLocation, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 0);
+
+            GL.BindVertexArray(0);
+
+            #endregion
+
+            #region Sphere
+
+            mSphereModelUtility = ModelUtility.LoadModel(@"Utility/Models/Sphere.bin");
+
+            GL.BindVertexArray(mVAO_IDs[7]);
+
+            GL.BindBuffer(BufferTarget.ArrayBuffer, mVBO_IDs[13]);
+            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(mSphereModelUtility.Vertices.Length * sizeof(float)), mSphereModelUtility.Vertices, BufferUsageHint.StaticDraw);
+
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, mVBO_IDs[14]);
             GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(mSphereModelUtility.Indices.Length * sizeof(float)), mSphereModelUtility.Indices, BufferUsageHint.StaticDraw);
 
             GL.EnableVertexAttribArray(vNormalLocation);
@@ -348,6 +450,8 @@ namespace Labs.ACW
             #endregion
 
             #region LightAndCamera
+
+            camera = Camera.User;
 
             #region Translations
 
@@ -394,17 +498,95 @@ namespace Labs.ACW
             GL.Uniform3(uSpecularLightLocation2, colour2);
 
             #endregion
-
-            ;
-
+            
             accelerationDueToGravity = -9.81f;
             coefficientOfRestitution = 0.75f;
 
             ellapsedTime = 0;
             randomEllapsedTime = random.Next(0, 1001);
             randomEllapsedTime = randomEllapsedTime / 1000;
-            
+
+            #region Initialising
+
+            #region Sphere
+
+            sphereOfDoom.mSpherePosition = new Vector3(0, -0.6f, 0);
+            sphereOfDoom.mSphereRadius = 0.12f;
+
+            #endregion
+
+            #region Cylinder
+
+            for (int i = 0; i < cylinderArray.Length; i++)
+            {
+                cylinderArray[i] = new Cylinder();
+            }
+
+            cylinderArray[0].mCylinderPosition = new Vector3(0, (float)((0.2 / (100 / 45)) + 0.2), 0);
+            cylinderArray[1].mCylinderPosition = new Vector3(0.1f, (float)(-(0.2 / (100 / 45)) + 0.2), 0);
+            cylinderArray[2].mCylinderPosition = new Vector3(-0.1f, (float)(-(0.2 / (100 / 45)) + 0.2), 0);
+            cylinderArray[3].mCylinderPosition = new Vector3(0, 0.2f, 0);
+            cylinderArray[4].mCylinderPosition = new Vector3(0, -0.2f, 0);
+            cylinderArray[5].mCylinderPosition = new Vector3(0, -0.2f, 0);
+
+            for (int i = 0; i < 3; i++)
+            {
+                cylinderArray[i].mCylinderRotation = new Vector3((float)Math.PI / 2, 0, 0);
+                cylinderArray[i].mCylinderRadius = 0.03f;
+                cylinderArray[i].mCylinderScale = new Vector3(1, 6.5f, 1);
+            }
+
+            cylinderArray[3].mCylinderRotation = new Vector3((float)Math.PI / 2, (float)Math.PI / 2, 0);
+            cylinderArray[4].mCylinderRotation = new Vector3((float)(2 * Math.PI / 3), (float)-Math.PI / 4, 0);
+            cylinderArray[5].mCylinderRotation = new Vector3((float)Math.PI / 2, (float)Math.PI / 4, 0);
+
+            cylinderArray[3].mCylinderRadius = 0.06f;
+            cylinderArray[4].mCylinderRadius = 0.06f;
+            cylinderArray[5].mCylinderRadius = 0.04f;
+
+            cylinderArray[3].mCylinderScale = new Vector3(1, 3.25f, 1);
+            cylinderArray[4].mCylinderScale = new Vector3(1, 4.25f, 1);
+            cylinderArray[5].mCylinderScale = new Vector3(1, 6, 1);
+
+            #region Texturing
+
+            Bitmap TextureBitmap;
+            BitmapData TextureData;
+
+            string filepath = @"ACW/MaxResDefault.jpg";
+
+            if (System.IO.File.Exists(filepath))
+            {
+                TextureBitmap = new Bitmap(filepath);
+                TextureData = TextureBitmap.LockBits(new System.Drawing.Rectangle(0, 0, TextureBitmap.Width, TextureBitmap.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppRgb);
+            }
+            else
+            {
+                throw new Exception("Could not find file " + filepath);
+            }
+
+            GL.ActiveTexture(TextureUnit.Texture0);
+            GL.GenTextures(1, out mTexture_ID);
+            GL.BindTexture(TextureTarget.Texture2D, mTexture_ID);
+            GL.TexImage2D(TextureTarget.Texture2D,
+            0, PixelInternalFormat.Rgba, TextureData.Width, TextureData.Height,
+            0, OpenTK.Graphics.OpenGL.PixelFormat.Bgra,
+            PixelType.UnsignedByte, TextureData.Scan0);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter,
+            (int)TextureMinFilter.Linear);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter,
+            (int)TextureMagFilter.Linear);
+            TextureBitmap.UnlockBits(TextureData);
+
+            #endregion
+
+            #endregion
+
             AddToList();
+
+            #endregion
+
+            onResizeBool = false;
 
             mTimer = new Timer();
             mTimer.Start();
@@ -414,64 +596,90 @@ namespace Labs.ACW
 
         protected override void OnKeyPress(KeyPressEventArgs e)
         {
-            if (e.KeyChar == 'w')
+            if (camera == Camera.User)
             {
-                mView = mView * Matrix4.CreateTranslation(0.0f, 0.0f, 0.05f);
-                int uView = GL.GetUniformLocation(mShader.ShaderProgramID, "uView");
-                GL.UniformMatrix4(uView, true, ref mView);
+                if (e.KeyChar == 'w')
+                {
+
+                    mView = mView * Matrix4.CreateTranslation(0.0f, 0.0f, 0.05f);
+                    int uView = GL.GetUniformLocation(mShader.ShaderProgramID, "uView");
+                    GL.UniformMatrix4(uView, true, ref mView);
+                }
+
+                if (e.KeyChar == 'a')
+                {
+                    mView = mView * Matrix4.CreateRotationY(-0.025f);
+                    int uView = GL.GetUniformLocation(mShader.ShaderProgramID, "uView");
+                    GL.UniformMatrix4(uView, true, ref mView);
+                }
+
+                if (e.KeyChar == 's')
+                {
+                    mView = mView * Matrix4.CreateTranslation(0.0f, 0.0f, -0.05f);
+                    int uView = GL.GetUniformLocation(mShader.ShaderProgramID, "uView");
+                    GL.UniformMatrix4(uView, true, ref mView);
+                }
+
+                if (e.KeyChar == 'd')
+                {
+                    mView = mView * Matrix4.CreateRotationY(0.025f);
+                    int uView = GL.GetUniformLocation(mShader.ShaderProgramID, "uView");
+                    GL.UniformMatrix4(uView, true, ref mView);
+                }
+
+                if (e.KeyChar == 'z')
+                {
+                    Vector3 t = mWorld.ExtractTranslation();
+                    Matrix4 translation = Matrix4.CreateTranslation(t);
+                    Matrix4 inverseTranslation = Matrix4.CreateTranslation(-t);
+                    mWorld = mWorld * inverseTranslation * Matrix4.CreateRotationY(-0.025f) * translation;
+                }
+
+                if (e.KeyChar == 'c')
+                {
+                    Vector3 t = mWorld.ExtractTranslation();
+                    Matrix4 translation = Matrix4.CreateTranslation(t);
+                    Matrix4 inverseTranslation = Matrix4.CreateTranslation(-t);
+                    mWorld = mWorld * inverseTranslation * Matrix4.CreateRotationY(0.025f) * translation;
+                }
+
+                if (e.KeyChar == 'r')
+                {
+                    Vector3 t = mWorld.ExtractTranslation();
+                    Matrix4 translation = Matrix4.CreateTranslation(t);
+                    Matrix4 inverseTranslation = Matrix4.CreateTranslation(-t);
+                    mWorld = mWorld * inverseTranslation * Matrix4.CreateRotationX(-0.025f) * translation;
+                }
+
+                if (e.KeyChar == 'f')
+                {
+                    Vector3 t = mWorld.ExtractTranslation();
+                    Matrix4 translation = Matrix4.CreateTranslation(t);
+                    Matrix4 inverseTranslation = Matrix4.CreateTranslation(-t);
+                    mWorld = mWorld * inverseTranslation * Matrix4.CreateRotationX(0.025f) * translation;
+                }
             }
 
-            if (e.KeyChar == 'a')
+            if (e.KeyChar == '1')
             {
-                mView = mView * Matrix4.CreateRotationY(-0.025f);
-                int uView = GL.GetUniformLocation(mShader.ShaderProgramID, "uView");
-                GL.UniformMatrix4(uView, true, ref mView);
+                camera = Camera.Static;
             }
 
-            if (e.KeyChar == 's')
+            if (e.KeyChar == '2')
             {
-                mView = mView * Matrix4.CreateTranslation(0.0f, 0.0f, -0.05f);
-                int uView = GL.GetUniformLocation(mShader.ShaderProgramID, "uView");
-                GL.UniformMatrix4(uView, true, ref mView);
+                camera = Camera.User;
             }
 
-            if (e.KeyChar == 'd')
+            if (e.KeyChar == '3')
             {
-                mView = mView * Matrix4.CreateRotationY(0.025f);
-                int uView = GL.GetUniformLocation(mShader.ShaderProgramID, "uView");
-                GL.UniformMatrix4(uView, true, ref mView);
+                camera = Camera.Moving;
             }
 
-            if (e.KeyChar == 'z')
+            if (e.KeyChar == '4')
             {
-                Vector3 t = mWorld.ExtractTranslation();
-                Matrix4 translation = Matrix4.CreateTranslation(t);
-                Matrix4 inverseTranslation = Matrix4.CreateTranslation(-t);
-                mWorld = mWorld * inverseTranslation * Matrix4.CreateRotationY(-0.025f) * translation;
-            }
+                randomBall = random.Next(0, (sphereList.Count + 1));
 
-            if (e.KeyChar == 'c')
-            {
-                Vector3 t = mWorld.ExtractTranslation();
-                Matrix4 translation = Matrix4.CreateTranslation(t);
-                Matrix4 inverseTranslation = Matrix4.CreateTranslation(-t);
-                mWorld = mWorld * inverseTranslation * Matrix4.CreateRotationY(0.025f) * translation;
-            }
-
-            if (e.KeyChar == 'r')
-            {
-                Vector3 t = mWorld.ExtractTranslation();
-                Matrix4 translation = Matrix4.CreateTranslation(t);
-                Matrix4 inverseTranslation = Matrix4.CreateTranslation(-t);
-                mWorld = mWorld * inverseTranslation * Matrix4.CreateRotationX(-0.025f) * translation;
-            }
-
-            if (e.KeyChar == 'f')
-            {
-                Vector3 t = mWorld.ExtractTranslation();
-                Matrix4 translation = Matrix4.CreateTranslation(t);
-                Matrix4 inverseTranslation = Matrix4.CreateTranslation(-t);
-                mWorld = mWorld * inverseTranslation * Matrix4.CreateRotationX(0.025f) * translation;
+                camera = Camera.Follow;
             }
 
             base.OnKeyPress(e);
@@ -479,6 +687,8 @@ namespace Labs.ACW
 
         protected override void OnResize(EventArgs e)
         {
+            onResizeBool = true;
+
             GL.Viewport(this.ClientRectangle);
 
             if (mShader != null)
@@ -493,6 +703,26 @@ namespace Labs.ACW
 
         protected override void OnUpdateFrame(FrameEventArgs e)
         {
+            if (camera == Camera.Moving)
+            {
+                Vector3 t = mWorld.ExtractTranslation();
+                Matrix4 translation = Matrix4.CreateTranslation(t);
+                Matrix4 inverseTranslation = Matrix4.CreateTranslation(-t);
+                mWorld = mWorld * inverseTranslation * Matrix4.CreateRotationY(-0.025f) * translation;
+            }
+
+            if (camera == Camera.Follow)
+            {
+                mWorld = Matrix4.CreateTranslation(sphereList[randomBall].mSpherePosition);
+            }
+
+            if(onResizeBool)
+            {
+                onResizeBool = false;
+
+                mTimer.GetElapsedSeconds();
+            }
+
             float timestep = mTimer.GetElapsedSeconds();
 
             ellapsedTime = ellapsedTime + timestep;
@@ -505,18 +735,51 @@ namespace Labs.ACW
 
                 sphereList[i].mSpherePosition = sphereList[i].mSpherePosition + sphereList[i].mSphereVelocity * timestep;
 
+                #region SphereCollide
+
                 for (int j = 0; j < i; j++)
                 {
                     if (j != i && (Math.Sqrt(Math.Pow((sphereList[j].mSpherePosition.X - sphereList[i].mSpherePosition.X), 2) + Math.Pow((sphereList[j].mSpherePosition.Y - sphereList[i].mSpherePosition.Y), 2) + Math.Pow((sphereList[j].mSpherePosition.Z - sphereList[i].mSpherePosition.Z), 2)) <= (sphereList[j].mSphereRadius + sphereList[i].mSphereRadius)))
                     {
-                        Vector3 tempVelocity = sphereList[j].mSphereVelocity;
+                        Vector3 temporaryVelocity = sphereList[j].mSphereVelocity;
 
                         sphereList[j].mSphereVelocity = (Vector3.Multiply(sphereList[i].mSphereVelocity, (sphereList[j].mSphereMass - sphereList[i].mSphereMass) / (sphereList[j].mSphereMass + sphereList[i].mSphereMass)) + Vector3.Multiply(sphereList[j].mSphereVelocity, (sphereList[i].mSphereMass * 2) / (sphereList[j].mSphereMass + sphereList[i].mSphereMass))) * coefficientOfRestitution;
-                        sphereList[i].mSphereVelocity = (Vector3.Multiply(tempVelocity, (sphereList[i].mSphereMass - sphereList[j].mSphereMass) / (sphereList[i].mSphereMass + sphereList[j].mSphereMass)) + Vector3.Multiply(sphereList[i].mSphereVelocity, (sphereList[j].mSphereMass * 2) / (sphereList[i].mSphereMass + sphereList[j].mSphereMass))) * coefficientOfRestitution;
+                        sphereList[i].mSphereVelocity = (Vector3.Multiply(temporaryVelocity, (sphereList[i].mSphereMass - sphereList[j].mSphereMass) / (sphereList[i].mSphereMass + sphereList[j].mSphereMass)) + Vector3.Multiply(sphereList[i].mSphereVelocity, (sphereList[j].mSphereMass * 2) / (sphereList[i].mSphereMass + sphereList[j].mSphereMass))) * coefficientOfRestitution;
 
                         sphereList[i].mSpherePosition = mPreviousSpherePosition;
                     }
                 }
+
+                #endregion
+
+                #region CylinderCollide
+
+                for (int j = 0; j < cylinderArray.Length; j++)
+                {
+                    /*
+                    if (Math.Sqrt(Math.Pow((cylinderArray[j].mCylinderPosition.Y - sphereList[i].mSpherePosition.Y), 2)) <= (cylinderArray[j].mCylinderRadius + sphereList[i].mSphereRadius) && (sphereList[i].mSpherePosition.Z >= cylinderArray[j].mCylinderPosition.Z + cylinderArray[j].mCylinderRadius && sphereList[i].mSpherePosition.Z <= cylinderArray[j].mCylinderPosition.Z - cylinderArray[j].mCylinderRadius))
+                    {
+                        Vector3 N = (cylinderArray[j].mCylinderPosition - sphereList[i].mSpherePosition).Normalized();
+
+                        sphereList[i].mSphereVelocity = sphereList[i].mSphereVelocity - Vector3.Dot(sphereList[i].mSphereVelocity, N) * N;
+
+                        sphereList[i].mSpherePosition = mPreviousSpherePosition;
+                    }
+                    */
+                }
+
+                #endregion
+
+                #region SphereOfDoomCollide
+
+                if (Math.Sqrt(Math.Pow((sphereOfDoom.mSpherePosition.X - sphereList[i].mSpherePosition.X), 2) + Math.Pow((sphereOfDoom.mSpherePosition.Y - sphereList[i].mSpherePosition.Y), 2) + Math.Pow((sphereOfDoom.mSpherePosition.Z - sphereList[i].mSpherePosition.Z), 2)) <= (sphereOfDoom.mSphereRadius + sphereList[i].mSphereRadius))
+                {
+                    
+                }
+
+                #endregion
+
+                #region WallCollide
 
                 if ((sphereList[i].mSpherePosition.X + (sphereList[i].mSphereRadius / mEmitterBoxModel.ExtractScale().X)) >= 0.2 || (sphereList[i].mSpherePosition.X - (sphereList[i].mSphereRadius / mEmitterBoxModel.ExtractScale().X)) <= -0.2)
                 {
@@ -528,11 +791,11 @@ namespace Labs.ACW
 
                 if ((sphereList[i].mSpherePosition.Y + (sphereList[i].mSphereRadius / mEmitterBoxModel.ExtractScale().Y)) <= -0.8)
                 {
-                    Vector3 tempPosition = sphereList[i].mSpherePosition;
-                    Vector3 tempVelocity = sphereList[i].mSphereVelocity;
+                    Vector3 temporaryPosition = sphereList[i].mSpherePosition;
+                    Vector3 temporaryVelocity = sphereList[i].mSphereVelocity;
 
-                    sphereList[i].mSphereVelocity.X = tempVelocity.Y;
-                    sphereList[i].mSphereVelocity.Y = tempVelocity.X;
+                    sphereList[i].mSphereVelocity.X = temporaryVelocity.Y;
+                    sphereList[i].mSphereVelocity.Y = temporaryVelocity.X;
 
                     sphereList[i].mSpherePosition.Y = 0.6f - sphereList[i].mSpherePosition.X;
                     sphereList[i].mSpherePosition.X = 0.2f - sphereList[i].mSphereRadius;
@@ -553,6 +816,8 @@ namespace Labs.ACW
 
                     sphereList[i].mSpherePosition = mPreviousSpherePosition;
                 }
+
+                #endregion
             }
 
             if (ellapsedTime > randomEllapsedTime)
@@ -594,8 +859,6 @@ namespace Labs.ACW
 
             float worldShininess = 0f;
             GL.Uniform1(uShininessLocation, worldShininess);
-
-
 
             GL.BindVertexArray(mVAO_IDs[0]);
             GL.DrawArrays(PrimitiveType.TriangleFan, 0, 4);
@@ -702,13 +965,62 @@ namespace Labs.ACW
 
             #endregion
 
+            #region SphereOfDoom
+
+            Matrix4 m5 = Matrix4.CreateScale(sphereOfDoom.mSphereRadius) * Matrix4.CreateTranslation(sphereOfDoom.mSpherePosition) * mWorld;
+            uModel = GL.GetUniformLocation(mShader.ShaderProgramID, "uModel");
+            GL.UniformMatrix4(uModel, true, ref m5);
+
+            Vector3 SphereOfDoomAmbientReflectivity = new Vector3(0.2125f, 0.1275f, 0.054f);
+            GL.Uniform3(uAmbientReflectivityLocation, SphereOfDoomAmbientReflectivity);
+
+            Vector3 SphereOfDoomDiffuseReflectivity = new Vector3(0.714f, 0.4284f, 0.18144f);
+            GL.Uniform3(uDiffuseReflectivityLocation, SphereOfDoomDiffuseReflectivity);
+
+            Vector3 SphereOfDoomSpecularReflectivity = new Vector3(0.393548f, 0.271906f, 0.166721f);
+            GL.Uniform3(uSpecularReflectivityLocation, SphereOfDoomSpecularReflectivity);
+
+            float SphereOfDoomShininess = 76.8f;
+            GL.Uniform1(uShininessLocation, SphereOfDoomShininess);
+
+            GL.BindVertexArray(mVAO_IDs[7]);
+            GL.DrawElements(PrimitiveType.Triangles, mSphereOfDoomModelUtility.Indices.Length, DrawElementsType.UnsignedInt, 0);
+
+            #endregion
+
+            #region Cylinder
+
+            for (int i = 0; i < cylinderArray.Length; i++)
+            {
+                Matrix4 m6 = Matrix4.CreateScale(cylinderArray[i].mCylinderScale) * Matrix4.CreateRotationX(cylinderArray[i].mCylinderRotation.X) * Matrix4.CreateRotationY(cylinderArray[i].mCylinderRotation.Y) * Matrix4.CreateScale(cylinderArray[i].mCylinderRadius) * Matrix4.CreateTranslation(cylinderArray[i].mCylinderPosition) * mWorld;
+                uModel = GL.GetUniformLocation(mShader.ShaderProgramID, "uModel");
+                GL.UniformMatrix4(uModel, true, ref m6);
+
+                Vector3 CylinderAmbientReflectivity = new Vector3(0.2125f, 0.1275f, 0.054f);
+                GL.Uniform3(uAmbientReflectivityLocation, CylinderAmbientReflectivity);
+
+                Vector3 CylinderDiffuseReflectivity = new Vector3(0.714f, 0.4284f, 0.18144f);
+                GL.Uniform3(uDiffuseReflectivityLocation, CylinderDiffuseReflectivity);
+
+                Vector3 CylinderSpecularReflectivity = new Vector3(0.393548f, 0.271906f, 0.166721f);
+                GL.Uniform3(uSpecularReflectivityLocation, CylinderSpecularReflectivity);
+
+                float CylinderShininess = 76.8f;
+                GL.Uniform1(uShininessLocation, CylinderShininess);
+
+                GL.BindVertexArray(mVAO_IDs[6]);
+                GL.DrawElements(PrimitiveType.Triangles, mCylinderModelUtility.Indices.Length, DrawElementsType.UnsignedInt, 0);
+            }
+
+            #endregion
+
             #region Sphere
 
             for (int i = 0; i < sphereList.Count; i++)
             {
-                Matrix4 m5 = Matrix4.CreateScale(sphereList[i].mSphereRadius) * Matrix4.CreateTranslation(sphereList[i].mSpherePosition) * mWorld;
+                Matrix4 m7 = Matrix4.CreateScale(sphereList[i].mSphereRadius) * Matrix4.CreateTranslation(sphereList[i].mSpherePosition) * mWorld;
                 uModel = GL.GetUniformLocation(mShader.ShaderProgramID, "uModel");
-                GL.UniformMatrix4(uModel, true, ref m5);
+                GL.UniformMatrix4(uModel, true, ref m7);
 
                 Vector3 SphereAmbientReflectivity = new Vector3(0.2125f, 0.1275f, 0.054f);
                 GL.Uniform3(uAmbientReflectivityLocation, SphereAmbientReflectivity);
@@ -722,7 +1034,7 @@ namespace Labs.ACW
                 float SphereShininess = 76.8f;
                 GL.Uniform1(uShininessLocation, SphereShininess);
 
-                GL.BindVertexArray(mVAO_IDs[5]);
+                GL.BindVertexArray(mVAO_IDs[7]);
                 GL.DrawElements(PrimitiveType.Triangles, mSphereModelUtility.Indices.Length, DrawElementsType.UnsignedInt, 0);
             }
 
