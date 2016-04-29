@@ -16,7 +16,7 @@ struct MaterialProperties
 	float Shininess;
 };
 
-uniform LightProperties uLight[3];
+uniform LightProperties uLight[4];
 uniform MaterialProperties uMaterial;
 uniform vec4 uEyePosition;
 uniform vec4 uColour;
@@ -30,7 +30,7 @@ void main()
 {
 	vec4 eyeDirection = normalize(uEyePosition - oSurfacePosition);
 
-	for(int i = 0; i < 3; ++i)
+	for(int i = 0; i < 4; ++i)
 	{
 		vec4 lightDir = normalize(uLight[i].Position - oSurfacePosition);
 
