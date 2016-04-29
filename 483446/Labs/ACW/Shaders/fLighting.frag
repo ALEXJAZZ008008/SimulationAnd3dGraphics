@@ -19,6 +19,7 @@ struct MaterialProperties
 uniform LightProperties uLight[3];
 uniform MaterialProperties uMaterial;
 uniform vec4 uEyePosition;
+uniform vec4 uColour;
 
 in vec4 oNormal;
 in vec4 oSurfacePosition;
@@ -38,6 +39,6 @@ void main()
 		vec4 reflectedVector = reflect(-lightDir, oNormal);
 		float specularFactor = pow(max(dot( reflectedVector, eyeDirection), 0.0),uMaterial.Shininess);
 
-		FragColour = FragColour + vec4(uLight[i].AmbientLight * uMaterial.AmbientReflectivity + uLight[i].DiffuseLight * uMaterial.DiffuseReflectivity * diffuseFactor + uLight[i].SpecularLight * uMaterial.SpecularReflectivity * specularFactor, 1);
+		FragColour = FragColour + (vec4(uLight[i].AmbientLight * uMaterial.AmbientReflectivity + uLight[i].DiffuseLight * uMaterial.DiffuseReflectivity * diffuseFactor + uLight[i].SpecularLight * uMaterial.SpecularReflectivity * specularFactor, 1) + uColour);
 	}
 }
