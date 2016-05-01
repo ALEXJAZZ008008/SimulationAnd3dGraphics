@@ -131,3 +131,9 @@ Z:\08214\Labs\bin\Debug\ACW\Shaders\vPassThrough.vert
 Z:\08214\Labs\bin\Debug\ACW\Shaders\fLighting2.frag
 Z:\08214\Labs\bin\Debug\ACW\Shaders\vPassThrough2.vert
 Z:\08214\Labs\bin\Debug\ACW\MaxResDefault.jpg
+C:\Users\Alex\Desktop\Programs\Coursework\08214\Labs\bin\Debug\ACW\Shaders\fLighting2.frag
+C:\Users\Alex\Desktop\Programs\Coursework\08214\Labs\bin\Debug\ACW\Shaders\vPassThrough2.vert
+C:\Users\Alex\Desktop\Programs\Coursework\08214\Labs\bin\Debug\Utility\Models\MiddleBox.sjg
+C:\Users\Alex\Desktop\Programs\Coursework\08214\Labs\bin\Debug\Utility\Models\BottomBox.sjg
+C:\Users\Alex\Desktop\Programs\Coursework\08214\Labs\bin\Debug\Utility\Models\TopBox.sjg
+C:\Users\Alex\Desktop\Programs\Coursework\08214\Labs\bin\Debug\ACW\MaxResDefault.jpg
