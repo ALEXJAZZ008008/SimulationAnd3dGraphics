@@ -14,7 +14,6 @@ namespace Labs.ACW
     {
         public Vector3 mCylinderPosition, mCylinderRotation, mCylinderScale;
 
-
         public float mCylinderRadius;
     }
 
@@ -71,7 +70,7 @@ namespace Labs.ACW
         private int randomBall;
 
         private Timer mTimer;
-        private bool onResizeBool, simulationBool, speedBool;
+        private bool onResizeBool, simulationBool, speedBool, lightBool;
         private float accelerationDueToGravity, coefficientOfRestitution, ellapsedTime, randomEllapsedTime;
 
         #endregion
@@ -589,6 +588,7 @@ namespace Labs.ACW
             onResizeBool = false;
             simulationBool = true;
             speedBool = false;
+            lightBool = false;
 
             mWorld2 = mWorld;
 
@@ -735,6 +735,8 @@ namespace Labs.ACW
 
         protected override void OnUpdateFrame(FrameEventArgs e)
         {
+            #region Camera/Time
+
             if (camera == Camera.Moving)
             {
                 Vector3 t = mWorld.ExtractTranslation();
@@ -748,6 +750,7 @@ namespace Labs.ACW
                 try
                 {
                     mWorld = mWorld * Matrix4.CreateTranslation(-(sphereList[randomBall].mSphereVelocity * (float)0.02));
+                    Console.WriteLine(mWorld);
                 }
                 catch
                 {
@@ -766,8 +769,12 @@ namespace Labs.ACW
 
             ellapsedTime = ellapsedTime + timestep;
 
+            #endregion
+
             for (int i = 0; i < sphereList.Count; i++)
             {
+                #region Velocity1
+
                 if (simulationBool)
                 {
                     if (speedBool)
@@ -779,6 +786,8 @@ namespace Labs.ACW
                         sphereList[i].mSphereVelocity.Y = sphereList[i].mSphereVelocity.Y + accelerationDueToGravity * timestep;
                     }
                 }
+
+                #endregion
 
                 Vector3 mPreviousSpherePosition = sphereList[i].mSpherePosition;
 
@@ -817,8 +826,10 @@ namespace Labs.ACW
                 int uDiffuseLightLocation4 = GL.GetUniformLocation(mShader.ShaderProgramID, "uLight[2].DiffuseLight");
                 int uSpecularLightLocation4 = GL.GetUniformLocation(mShader.ShaderProgramID, "uLight[2].SpecularLight");
 
-                if (Math.Sqrt(Math.Pow((sphereList[i].mSpherePosition.X - sphereOfDoom.mSpherePosition.X), 2) + Math.Pow((sphereList[i].mSpherePosition.Y - sphereOfDoom.mSpherePosition.Y), 2) + Math.Pow((sphereList[i].mSpherePosition.Z - sphereOfDoom.mSpherePosition.Z), 2)) <= (sphereList[i].mSphereRadius + sphereOfDoom.mSphereRadius))
+                if (lightBool || Math.Sqrt(Math.Pow((sphereList[i].mSpherePosition.X - sphereOfDoom.mSpherePosition.X), 2) + Math.Pow((sphereList[i].mSpherePosition.Y - sphereOfDoom.mSpherePosition.Y), 2) + Math.Pow((sphereList[i].mSpherePosition.Z - sphereOfDoom.mSpherePosition.Z), 2)) <= (sphereList[i].mSphereRadius + sphereOfDoom.mSphereRadius))
                 {
+                    lightBool = true;
+
                     Vector4 lightPosition2 = Vector4.Transform(new Vector4(sphereList[i].mSpherePosition, 1), mView);
                     GL.Uniform4(uLightPositionLocation4, lightPosition2);
 
@@ -847,6 +858,14 @@ namespace Labs.ACW
                     sphereList[i].mSpherePosition = mPreviousSpherePosition;
                 }
 
+                if (sphereList[i].mSpherePosition.Y - sphereList[i].mSphereRadius >= 0.8)
+                {
+                    Vector3 normal = new Vector3(0, -1, 0);
+                    sphereList[i].mSphereVelocity = (sphereList[i].mSphereVelocity - 2 * Vector3.Dot(normal, sphereList[i].mSphereVelocity) * normal) * coefficientOfRestitution;
+
+                    sphereList[i].mSpherePosition = mPreviousSpherePosition;
+                }
+
                 if (sphereList[i].mSpherePosition.Y + sphereList[i].mSphereRadius <= -0.8)
                 {
                     Vector3 temporaryPosition = sphereList[i].mSpherePosition;
@@ -859,14 +878,6 @@ namespace Labs.ACW
                     sphereList[i].mSpherePosition.X = 0.2f - sphereList[i].mSphereRadius;
                 }
 
-                if (sphereList[i].mSpherePosition.Y - sphereList[i].mSphereRadius >= 0.8)
-                {
-                    Vector3 normal = new Vector3(0, -1, 0);
-                    sphereList[i].mSphereVelocity = (sphereList[i].mSphereVelocity - 2 * Vector3.Dot(normal, sphereList[i].mSphereVelocity) * normal) * coefficientOfRestitution;
-                    
-                    sphereList[i].mSpherePosition = mPreviousSpherePosition;
-                }
-
                 if (sphereList[i].mSpherePosition.Z + sphereList[i].mSphereRadius >= 0.2 || sphereList[i].mSpherePosition.Z - sphereList[i].mSphereRadius <= -0.2)
                 {
                     Vector3 normal = new Vector3(0, 0, -1);
@@ -876,6 +887,8 @@ namespace Labs.ACW
                 }
 
                 #endregion
+
+                #region Velocity2
 
                 if (!simulationBool)
                 {
@@ -888,7 +901,11 @@ namespace Labs.ACW
                         sphereList[i].mSphereVelocity.Y = sphereList[i].mSphereVelocity.Y + accelerationDueToGravity * timestep;
                     }
                 }
+
+                #endregion
             }
+
+            #region AddSphere
 
             if (ellapsedTime > randomEllapsedTime)
             {
@@ -898,6 +915,8 @@ namespace Labs.ACW
                 randomEllapsedTime = random.Next(0, 1001);
                 randomEllapsedTime = randomEllapsedTime / 1000;
             }
+
+            #endregion
 
             base.OnUpdateFrame(e);
         }
@@ -914,7 +933,7 @@ namespace Labs.ACW
 
             #region World
 
-
+            
 
             #endregion
 
@@ -1019,6 +1038,8 @@ namespace Labs.ACW
             #endregion
 
             #region SphereOfDoom
+
+            lightBool = false;
 
             Matrix4 m5 = Matrix4.CreateScale(sphereOfDoom.mSphereRadius) * Matrix4.CreateTranslation(sphereOfDoom.mSpherePosition) * mWorld;
             uModel = GL.GetUniformLocation(mShader.ShaderProgramID, "uModel");
