@@ -35,10 +35,11 @@ void main()
 		vec4 lightDir = normalize(uLight[i].Position - oSurfacePosition);
 
 		float diffuseFactor = max(dot(oNormal, lightDir), 0);
-
 		vec4 reflectedVector = reflect(-lightDir, oNormal);
-		float specularFactor = pow(max(dot( reflectedVector, eyeDirection), 0.0),uMaterial.Shininess);
+		float specularFactor = pow(max(dot(reflectedVector, eyeDirection), 0.0), uMaterial.Shininess);
 
-		FragColour = FragColour + (vec4(uLight[i].AmbientLight * uMaterial.AmbientReflectivity + uLight[i].DiffuseLight * uMaterial.DiffuseReflectivity * diffuseFactor + uLight[i].SpecularLight * uMaterial.SpecularReflectivity * specularFactor, 1) + uColour);
+		FragColour = FragColour + vec4((uLight[i].AmbientLight * uMaterial.AmbientReflectivity) + (uLight[i].DiffuseLight * uMaterial.DiffuseReflectivity * diffuseFactor) + (uLight[i].SpecularLight * uMaterial.SpecularReflectivity * specularFactor), 1);
 	}
+
+	FragColour = FragColour + uColour;
 }
