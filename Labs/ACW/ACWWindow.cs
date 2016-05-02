@@ -22,22 +22,14 @@ namespace Labs.ACW
         public Vector3 mSpherePosition, mSphereVelocity;
 
         public float mSphereRadius, mSphereMass;
+
+        public bool mSphereBool;
     }
 
     public class ACWWindow : GameWindow
     {
         public ACWWindow()
-            : base(
-                800, // Width
-                600, // Height
-                GraphicsMode.Default,
-                "Assessed Coursework",
-                GameWindowFlags.Default,
-                DisplayDevice.Default,
-                3, // major
-                3, // minor
-                GraphicsContextFlags.ForwardCompatible
-                )
+            : base(800, 600, GraphicsMode.Default, "Assessed Coursework", GameWindowFlags.Default, DisplayDevice.Default, 3, 3, GraphicsContextFlags.ForwardCompatible)
         {
 
         }
@@ -55,7 +47,7 @@ namespace Labs.ACW
         private int[] mVBO_IDs = new int[15];
         private int[] mVAO_IDs = new int[8];
 
-        private ShaderUtility mShader;
+        private ShaderUtility mShader, mShader2;
         private ModelUtility mEmitterBoxModelUtility, mGridBox1ModelUtility, mGridBox2ModelUtility, mSphereOfDoomBoxModelUtility, mSphereOfDoomModelUtility, mCylinderModelUtility, mSphereModelUtility;
         private Matrix4 mView, mEmitterBoxModel, mGridBox1Model, mGridBox2Model, mSphereOfDoomBoxModel, mWorld, mWorld2;
         private int mTexture_ID;
@@ -67,10 +59,10 @@ namespace Labs.ACW
         private Random random = new Random();
 
         Camera camera;
-        private int randomBall;
+        private int randomSphere;
 
         private Timer mTimer;
-        private bool onResizeBool, simulationBool, speedBool, lightBool;
+        private bool updateBool, onResizeBool, simulationBool, speedBool;
         private float accelerationDueToGravity, coefficientOfRestitution, ellapsedTime, randomEllapsedTime;
 
         #endregion
@@ -81,19 +73,23 @@ namespace Labs.ACW
 
             if (random.Next(0, 2) == 1)
             {
+                sphereItem.mSphereBool = true;
+
                 sphereItem.mSphereRadius = 0.02F;
 
                 sphereItem.mSphereMass = (float)(0.0012f * ((4 / 3) * Math.PI * Math.Pow(sphereItem.mSphereRadius, 3)));
             }
             else
             {
+                sphereItem.mSphereBool = false;
+
                 sphereItem.mSphereRadius = 0.028f;
 
                 sphereItem.mSphereMass = (float)(0.0014f * ((4 / 3) * Math.PI * Math.Pow(sphereItem.mSphereRadius, 3)));
             }
 
-            sphereItem.mSpherePosition = new Vector3(random.Next(-200, 200), random.Next(-200, 200), random.Next(-200, 200));
-            sphereItem.mSpherePosition = new Vector3(sphereItem.mSpherePosition.X / 1000, ((sphereItem.mSpherePosition.Y / 1000) + 0.6f) - sphereItem.mSphereRadius, sphereItem.mSpherePosition.Z / 1000);
+            sphereItem.mSpherePosition = new Vector3(random.Next(-200, 201), random.Next(-200, 201), random.Next(-200, 201));
+            sphereItem.mSpherePosition = new Vector3(sphereItem.mSpherePosition.X / 1000, (sphereItem.mSpherePosition.Y / 1000) + 0.6f, sphereItem.mSpherePosition.Z / 1000);
 
             if (sphereItem.mSpherePosition.X > 0)
             {
@@ -101,7 +97,22 @@ namespace Labs.ACW
             }
             else
             {
-                sphereItem.mSpherePosition = new Vector3(sphereItem.mSpherePosition.X + sphereItem.mSphereRadius, sphereItem.mSpherePosition.Y, sphereItem.mSpherePosition.Z);
+                if (sphereItem.mSpherePosition.X < 0)
+                {
+                    sphereItem.mSpherePosition = new Vector3(sphereItem.mSpherePosition.X + sphereItem.mSphereRadius, sphereItem.mSpherePosition.Y, sphereItem.mSpherePosition.Z);
+                }
+            }
+
+            if (sphereItem.mSpherePosition.Y > 0)
+            {
+                sphereItem.mSpherePosition = new Vector3(sphereItem.mSpherePosition.X, sphereItem.mSpherePosition.Y - sphereItem.mSphereRadius, sphereItem.mSpherePosition.Z);
+            }
+            else
+            {
+                if (sphereItem.mSpherePosition.Y < 0)
+                {
+                    sphereItem.mSpherePosition = new Vector3(sphereItem.mSpherePosition.X, sphereItem.mSpherePosition.Y + sphereItem.mSphereRadius, sphereItem.mSpherePosition.Z);
+                }
             }
 
             if (sphereItem.mSpherePosition.Z > 0)
@@ -110,7 +121,10 @@ namespace Labs.ACW
             }
             else
             {
-                sphereItem.mSpherePosition = new Vector3(sphereItem.mSpherePosition.X, sphereItem.mSpherePosition.Y, sphereItem.mSpherePosition.Z + sphereItem.mSphereRadius);
+                if (sphereItem.mSpherePosition.Z < 0)
+                {
+                    sphereItem.mSpherePosition = new Vector3(sphereItem.mSpherePosition.X, sphereItem.mSpherePosition.Y, sphereItem.mSpherePosition.Z + sphereItem.mSphereRadius);
+                }
             }
 
             sphereItem.mSphereVelocity = new Vector3(random.Next(-1000, 1001), random.Next(-1000, 1001), random.Next(-1000, 1001));
@@ -137,30 +151,17 @@ namespace Labs.ACW
 
             mShader = new ShaderUtility(@"ACW/Shaders/vPassThrough.vert", @"ACW/Shaders/fLighting.frag");
             GL.UseProgram(mShader.ShaderProgramID);
+            mShader2 = new ShaderUtility(@"ACW/Shaders/vPassThrough2.vert", @"ACW/Shaders/fLighting2.frag");
+            //GL.UseProgram(mShader2.ShaderProgramID);
 
             int vPositionLocation = GL.GetAttribLocation(mShader.ShaderProgramID, "vPosition");
+            int vPositionLocation2 = GL.GetAttribLocation(mShader2.ShaderProgramID, "vPosition");
             int vNormalLocation = GL.GetAttribLocation(mShader.ShaderProgramID, "vNormal");
+            int vNormalLocation2 = GL.GetAttribLocation(mShader2.ShaderProgramID, "vNormal");
             int uView = GL.GetUniformLocation(mShader.ShaderProgramID, "uView");
+            int uView2 = GL.GetUniformLocation(mShader2.ShaderProgramID, "uView");
             int uEyePositionLocation = GL.GetUniformLocation(mShader.ShaderProgramID, "uEyePosition");
-
-            #region Box
-
-            #region Light
-
-            int uLightPositionLocation0 = GL.GetUniformLocation(mShader.ShaderProgramID, "uLight[0].Position");
-            int uAmbientLightLocation0 = GL.GetUniformLocation(mShader.ShaderProgramID, "uLight[0].AmbientLight");
-            int uDiffuseLightLocation0 = GL.GetUniformLocation(mShader.ShaderProgramID, "uLight[0].DiffuseLight");
-            int uSpecularLightLocation0 = GL.GetUniformLocation(mShader.ShaderProgramID, "uLight[0].SpecularLight");
-            int uLightPositionLocation1 = GL.GetUniformLocation(mShader.ShaderProgramID, "uLight[1].Position");
-            int uAmbientLightLocation1 = GL.GetUniformLocation(mShader.ShaderProgramID, "uLight[1].AmbientLight");
-            int uDiffuseLightLocation1 = GL.GetUniformLocation(mShader.ShaderProgramID, "uLight[1].DiffuseLight");
-            int uSpecularLightLocation1 = GL.GetUniformLocation(mShader.ShaderProgramID, "uLight[1].SpecularLight");
-            int uLightPositionLocation2 = GL.GetUniformLocation(mShader.ShaderProgramID, "uLight[2].Position");
-            int uAmbientLightLocation2 = GL.GetUniformLocation(mShader.ShaderProgramID, "uLight[2].AmbientLight");
-            int uDiffuseLightLocation2 = GL.GetUniformLocation(mShader.ShaderProgramID, "uLight[2].DiffuseLight");
-            int uSpecularLightLocation2 = GL.GetUniformLocation(mShader.ShaderProgramID, "uLight[2].SpecularLight");
-
-            #endregion
+            int uEyePositionLocation2 = GL.GetUniformLocation(mShader2.ShaderProgramID, "uEyePosition");
 
             #region World
 
@@ -193,6 +194,8 @@ namespace Labs.ACW
             GL.BindVertexArray(0);
 
             #endregion
+
+            #region Box
 
             #region EmitterBox
 
@@ -388,8 +391,8 @@ namespace Labs.ACW
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, mVBO_IDs[12]);
             GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(mCylinderModelUtility.Indices.Length * sizeof(float)), mCylinderModelUtility.Indices, BufferUsageHint.StaticDraw);
 
-            GL.EnableVertexAttribArray(vNormalLocation);
-            GL.VertexAttribPointer(vNormalLocation, 3, VertexAttribPointerType.Float, true, 6 * sizeof(float), 3 * sizeof(float));
+            GL.EnableVertexAttribArray(vNormalLocation2);
+            GL.VertexAttribPointer(vNormalLocation2, 3, VertexAttribPointerType.Float, true, 6 * sizeof(float), 3 * sizeof(float));
 
             GL.GetBufferParameter(BufferTarget.ArrayBuffer, BufferParameterName.BufferSize, out size);
 
@@ -405,8 +408,8 @@ namespace Labs.ACW
                 throw new ApplicationException("Index data not loaded onto graphics card correctly");
             }
 
-            GL.EnableVertexAttribArray(vPositionLocation);
-            GL.VertexAttribPointer(vPositionLocation, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 0);
+            GL.EnableVertexAttribArray(vPositionLocation2);
+            GL.VertexAttribPointer(vPositionLocation2, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 0);
 
             GL.BindVertexArray(0);
 
@@ -424,8 +427,8 @@ namespace Labs.ACW
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, mVBO_IDs[14]);
             GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(mSphereModelUtility.Indices.Length * sizeof(float)), mSphereModelUtility.Indices, BufferUsageHint.StaticDraw);
 
-            GL.EnableVertexAttribArray(vNormalLocation);
-            GL.VertexAttribPointer(vNormalLocation, 3, VertexAttribPointerType.Float, true, 6 * sizeof(float), 3 * sizeof(float));
+            GL.EnableVertexAttribArray(vNormalLocation2);
+            GL.VertexAttribPointer(vNormalLocation2, 3, VertexAttribPointerType.Float, true, 6 * sizeof(float), 3 * sizeof(float));
 
             GL.GetBufferParameter(BufferTarget.ArrayBuffer, BufferParameterName.BufferSize, out size);
 
@@ -441,8 +444,8 @@ namespace Labs.ACW
                 throw new ApplicationException("Index data not loaded onto graphics card correctly");
             }
 
-            GL.EnableVertexAttribArray(vPositionLocation);
-            GL.VertexAttribPointer(vPositionLocation, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 0);
+            GL.EnableVertexAttribArray(vPositionLocation2);
+            GL.VertexAttribPointer(vPositionLocation2, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 0);
 
             GL.BindVertexArray(0);
 
@@ -456,6 +459,7 @@ namespace Labs.ACW
 
             mView = Matrix4.CreateTranslation(0, -1.5f, 0);
             GL.UniformMatrix4(uView, true, ref mView);
+            GL.UniformMatrix4(uView2, true, ref mView);
 
             mWorld = Matrix4.CreateTranslation(0, 1.5f, -2f);
 
@@ -471,6 +475,28 @@ namespace Labs.ACW
 
             Vector4 eyePosition = Vector4.Transform(new Vector4(0, 0, 0, 1), mView);
             GL.Uniform4(uEyePositionLocation, eyePosition);
+            GL.Uniform4(uEyePositionLocation2, eyePosition);
+
+            #region LightVariables
+
+            int uLightPositionLocation0 = GL.GetUniformLocation(mShader.ShaderProgramID, "uLight[0].Position");
+            int uAmbientLightLocation0 = GL.GetUniformLocation(mShader.ShaderProgramID, "uLight[0].AmbientLight");
+            int uDiffuseLightLocation0 = GL.GetUniformLocation(mShader.ShaderProgramID, "uLight[0].DiffuseLight");
+            int uSpecularLightLocation0 = GL.GetUniformLocation(mShader.ShaderProgramID, "uLight[0].SpecularLight");
+            int uLightPositionLocation1 = GL.GetUniformLocation(mShader.ShaderProgramID, "uLight[1].Position");
+            int uAmbientLightLocation1 = GL.GetUniformLocation(mShader.ShaderProgramID, "uLight[1].AmbientLight");
+            int uDiffuseLightLocation1 = GL.GetUniformLocation(mShader.ShaderProgramID, "uLight[1].DiffuseLight");
+            int uSpecularLightLocation1 = GL.GetUniformLocation(mShader.ShaderProgramID, "uLight[1].SpecularLight");
+            int uLightPositionLocation2 = GL.GetUniformLocation(mShader.ShaderProgramID, "uLight[2].Position");
+            int uAmbientLightLocation2 = GL.GetUniformLocation(mShader.ShaderProgramID, "uLight[2].AmbientLight");
+            int uDiffuseLightLocation2 = GL.GetUniformLocation(mShader.ShaderProgramID, "uLight[2].DiffuseLight");
+            int uSpecularLightLocation2 = GL.GetUniformLocation(mShader.ShaderProgramID, "uLight[2].SpecularLight");
+            int uLightPositionLocation = GL.GetUniformLocation(mShader2.ShaderProgramID, "uLight.Position");
+            int uAmbientLightLocation = GL.GetUniformLocation(mShader2.ShaderProgramID, "uLight.AmbientLight");
+            int uDiffuseLightLocation = GL.GetUniformLocation(mShader2.ShaderProgramID, "uLight.DiffuseLight");
+            int uSpecularLightLocation = GL.GetUniformLocation(mShader2.ShaderProgramID, "uLight.SpecularLight");
+
+            #endregion
 
             Vector4 lightPosition0 = Vector4.Transform(new Vector4(5, 5, -6, 1), mView);
             GL.Uniform4(uLightPositionLocation0, lightPosition0);
@@ -480,6 +506,9 @@ namespace Labs.ACW
 
             Vector4 lightPosition2 = Vector4.Transform(new Vector4(-5, 5, -6, 1), mView);
             GL.Uniform4(uLightPositionLocation2, lightPosition2);
+
+            Vector4 lightPosition = Vector4.Transform(new Vector4(5, 5, -6, 1), mView);
+            GL.Uniform4(uLightPositionLocation, lightPosition);
 
             Vector3 colour0 = new Vector3(1, 1, 1);
             GL.Uniform3(uAmbientLightLocation0, colour0);
@@ -496,7 +525,14 @@ namespace Labs.ACW
             GL.Uniform3(uDiffuseLightLocation2, colour2);
             GL.Uniform3(uSpecularLightLocation2, colour2);
 
+            Vector3 colour = new Vector3(1, 1, 1);
+            GL.Uniform3(uAmbientLightLocation, colour);
+            GL.Uniform3(uDiffuseLightLocation, colour);
+            GL.Uniform3(uSpecularLightLocation, colour);
+
             #endregion
+
+            #region Initialising
 
             accelerationDueToGravity = -9.81f;
             coefficientOfRestitution = 0.75f;
@@ -504,8 +540,6 @@ namespace Labs.ACW
             ellapsedTime = 0;
             randomEllapsedTime = random.Next(0, 1001);
             randomEllapsedTime = randomEllapsedTime / 1000;
-
-            #region Initialising
 
             #region Sphere
 
@@ -583,17 +617,19 @@ namespace Labs.ACW
 
             AddToList();
 
-            #endregion
+            randomSphere = 0;
 
+            updateBool = true;
             onResizeBool = false;
             simulationBool = true;
             speedBool = false;
-            lightBool = false;
 
             mWorld2 = mWorld;
 
             mTimer = new Timer();
             mTimer.Start();
+
+            #endregion
 
             base.OnLoad(e);
         }
@@ -602,36 +638,43 @@ namespace Labs.ACW
         {
             if (camera == Camera.User)
             {
-                if (e.KeyChar == 'w')
+                if (e.KeyChar == 'w' || e.KeyChar == 'W')
                 {
-
                     mView = mView * Matrix4.CreateTranslation(0.0f, 0.0f, 0.05f);
                     int uView = GL.GetUniformLocation(mShader.ShaderProgramID, "uView");
                     GL.UniformMatrix4(uView, true, ref mView);
+                    int uView2 = GL.GetUniformLocation(mShader2.ShaderProgramID, "uView");
+                    GL.UniformMatrix4(uView2, true, ref mView);
                 }
 
-                if (e.KeyChar == 'a')
+                if (e.KeyChar == 'a' || e.KeyChar == 'A')
                 {
                     mView = mView * Matrix4.CreateRotationY(-0.025f);
                     int uView = GL.GetUniformLocation(mShader.ShaderProgramID, "uView");
                     GL.UniformMatrix4(uView, true, ref mView);
+                    int uView2 = GL.GetUniformLocation(mShader2.ShaderProgramID, "uView");
+                    GL.UniformMatrix4(uView2, true, ref mView);
                 }
 
-                if (e.KeyChar == 's')
+                if (e.KeyChar == 's' || e.KeyChar == 'S')
                 {
                     mView = mView * Matrix4.CreateTranslation(0.0f, 0.0f, -0.05f);
                     int uView = GL.GetUniformLocation(mShader.ShaderProgramID, "uView");
                     GL.UniformMatrix4(uView, true, ref mView);
+                    int uView2 = GL.GetUniformLocation(mShader2.ShaderProgramID, "uView");
+                    GL.UniformMatrix4(uView2, true, ref mView);
                 }
 
-                if (e.KeyChar == 'd')
+                if (e.KeyChar == 'd' || e.KeyChar == 'D')
                 {
                     mView = mView * Matrix4.CreateRotationY(0.025f);
                     int uView = GL.GetUniformLocation(mShader.ShaderProgramID, "uView");
                     GL.UniformMatrix4(uView, true, ref mView);
+                    int uView2 = GL.GetUniformLocation(mShader2.ShaderProgramID, "uView");
+                    GL.UniformMatrix4(uView2, true, ref mView);
                 }
 
-                if (e.KeyChar == 'z')
+                if (e.KeyChar == 'z' || e.KeyChar == 'Z')
                 {
                     Vector3 t = mWorld.ExtractTranslation();
                     Matrix4 translation = Matrix4.CreateTranslation(t);
@@ -639,7 +682,7 @@ namespace Labs.ACW
                     mWorld = mWorld * inverseTranslation * Matrix4.CreateRotationY(-0.025f) * translation;
                 }
 
-                if (e.KeyChar == 'c')
+                if (e.KeyChar == 'c' || e.KeyChar == 'C')
                 {
                     Vector3 t = mWorld.ExtractTranslation();
                     Matrix4 translation = Matrix4.CreateTranslation(t);
@@ -647,7 +690,7 @@ namespace Labs.ACW
                     mWorld = mWorld * inverseTranslation * Matrix4.CreateRotationY(0.025f) * translation;
                 }
 
-                if (e.KeyChar == 'r')
+                if (e.KeyChar == 'r' || e.KeyChar == 'R')
                 {
                     Vector3 t = mWorld.ExtractTranslation();
                     Matrix4 translation = Matrix4.CreateTranslation(t);
@@ -655,7 +698,7 @@ namespace Labs.ACW
                     mWorld = mWorld * inverseTranslation * Matrix4.CreateRotationX(-0.025f) * translation;
                 }
 
-                if (e.KeyChar == 'f')
+                if (e.KeyChar == 'f' || e.KeyChar == 'F')
                 {
                     Vector3 t = mWorld.ExtractTranslation();
                     Matrix4 translation = Matrix4.CreateTranslation(t);
@@ -685,12 +728,25 @@ namespace Labs.ACW
             if (e.KeyChar == '4')
             {
                 mWorld = mWorld2;
-                randomBall = random.Next(0, (sphereList.Count + 1));
+
+                randomSphere = random.Next(0, (sphereList.Count));
 
                 camera = Camera.Follow;
             }
 
-            if (e.KeyChar == 'x')
+            if (e.KeyChar == 'q' || e.KeyChar == 'Q')
+            {
+                if (speedBool)
+                {
+                    speedBool = false;
+                }
+                else
+                {
+                    speedBool = true;
+                }
+            }
+
+            if (e.KeyChar == 'e' || e.KeyChar == 'E')
             {
                 if (simulationBool)
                 {
@@ -702,16 +758,11 @@ namespace Labs.ACW
                 }
             }
 
-            if (e.KeyChar == 'q')
+            if (e.KeyChar == '!')
             {
-                if (speedBool)
-                {
-                    speedBool = false;
-                }
-                else
-                {
-                    speedBool = true;
-                }
+                OnUnload(e);
+
+                Exit();
             }
 
             base.OnKeyPress(e);
@@ -735,388 +786,504 @@ namespace Labs.ACW
 
         protected override void OnUpdateFrame(FrameEventArgs e)
         {
-            #region Camera/Time
-
-            if (camera == Camera.Moving)
+            if (!updateBool)
             {
-                Vector3 t = mWorld.ExtractTranslation();
-                Matrix4 translation = Matrix4.CreateTranslation(t);
-                Matrix4 inverseTranslation = Matrix4.CreateTranslation(-t);
-                mWorld = mWorld * inverseTranslation * Matrix4.CreateRotationY(-0.025f) * translation;
-            }
+                updateBool = true;
 
-            if (camera == Camera.Follow)
-            {
-                try
+                #region Camera/Time
+
+                if (camera == Camera.Moving)
                 {
-                    mWorld = mWorld * Matrix4.CreateTranslation(-(sphereList[randomBall].mSphereVelocity * (float)0.02));
-                    Console.WriteLine(mWorld);
+                    Vector3 t = mWorld.ExtractTranslation();
+                    Matrix4 translation = Matrix4.CreateTranslation(t);
+                    Matrix4 inverseTranslation = Matrix4.CreateTranslation(-t);
+                    mWorld = mWorld * inverseTranslation * Matrix4.CreateRotationY(-0.025f) * translation;
                 }
-                catch
-                {
 
+                if (camera == Camera.Follow)
+                {
+                    mWorld.Row3 = new Vector4(-sphereList[randomSphere].mSpherePosition.X, -(sphereList[randomSphere].mSpherePosition.Y - 1.6f), -(sphereList[randomSphere].mSpherePosition.Z + 1), 1);
                 }
-            }
 
-            if(onResizeBool)
-            {
-                onResizeBool = false;
-
-                mTimer.GetElapsedSeconds();
-            }
-
-            float timestep = mTimer.GetElapsedSeconds();
-
-            ellapsedTime = ellapsedTime + timestep;
-
-            #endregion
-
-            for (int i = 0; i < sphereList.Count; i++)
-            {
-                #region Velocity1
-
-                if (simulationBool)
+                if (onResizeBool)
                 {
-                    if (speedBool)
-                    {
-                        sphereList[i].mSphereVelocity.Y = (sphereList[i].mSphereVelocity.Y + accelerationDueToGravity * timestep) / 2;
-                    }
-                    else
-                    {
-                        sphereList[i].mSphereVelocity.Y = sphereList[i].mSphereVelocity.Y + accelerationDueToGravity * timestep;
-                    }
+                    onResizeBool = false;
+
+                    mTimer.GetElapsedSeconds();
+                }
+
+                float timestep = mTimer.GetElapsedSeconds();
+
+                ellapsedTime = ellapsedTime + timestep;
+
+                #endregion
+
+                #region AddSphere
+
+                if (ellapsedTime > randomEllapsedTime)
+                {
+                    AddToList();
+
+                    ellapsedTime = 0;
+                    randomEllapsedTime = random.Next(0, 1001);
+                    randomEllapsedTime = randomEllapsedTime / 1000;
                 }
 
                 #endregion
 
-                Vector3 mPreviousSpherePosition = sphereList[i].mSpherePosition;
-
-                sphereList[i].mSpherePosition = sphereList[i].mSpherePosition + sphereList[i].mSphereVelocity * timestep;
-
-                #region SphereCollide
-
-                for (int j = 0; j < i; j++)
+                for (int i = 0; i < sphereList.Count; i++)
                 {
-                    if (j != i && (Math.Sqrt(Math.Pow((sphereList[i].mSpherePosition.X - sphereList[j].mSpherePosition.X), 2) + Math.Pow((sphereList[i].mSpherePosition.Y - sphereList[j].mSpherePosition.Y), 2) + Math.Pow((sphereList[i].mSpherePosition.Z - sphereList[j].mSpherePosition.Z), 2)) <= (sphereList[i].mSphereRadius + sphereList[j].mSphereRadius)))
+                    #region Velocity1
+
+                    if (simulationBool)
                     {
-                        Vector3 temporaryVelocity = sphereList[i].mSphereVelocity;
+                        if (speedBool)
+                        {
+                            sphereList[i].mSphereVelocity.Y = (sphereList[i].mSphereVelocity.Y + accelerationDueToGravity * timestep) / 2;
+                        }
+                        else
+                        {
+                            sphereList[i].mSphereVelocity.Y = sphereList[i].mSphereVelocity.Y + accelerationDueToGravity * timestep;
+                        }
+                    }
 
-                        sphereList[i].mSphereVelocity = (Vector3.Multiply(temporaryVelocity, (sphereList[i].mSphereMass - sphereList[j].mSphereMass) / (sphereList[i].mSphereMass + sphereList[j].mSphereMass)) + Vector3.Multiply(sphereList[i].mSphereVelocity, (sphereList[j].mSphereMass * 2) / (sphereList[i].mSphereMass + sphereList[j].mSphereMass))) * coefficientOfRestitution;
-                        sphereList[j].mSphereVelocity = (Vector3.Multiply(sphereList[i].mSphereVelocity, (sphereList[j].mSphereMass - sphereList[i].mSphereMass) / (sphereList[j].mSphereMass + sphereList[i].mSphereMass)) + Vector3.Multiply(sphereList[j].mSphereVelocity, (sphereList[i].mSphereMass * 2) / (sphereList[j].mSphereMass + sphereList[i].mSphereMass))) * coefficientOfRestitution;
+                    #endregion
 
+                    Vector3 mPreviousSpherePosition = sphereList[i].mSpherePosition;
+
+                    sphereList[i].mSpherePosition = sphereList[i].mSpherePosition + sphereList[i].mSphereVelocity * timestep;
+
+                    #region WallCollide
+
+                    if (sphereList[i].mSpherePosition.X + sphereList[i].mSphereRadius >= 0.2 || sphereList[i].mSpherePosition.X - sphereList[i].mSphereRadius <= -0.2)
+                    {
                         sphereList[i].mSpherePosition = mPreviousSpherePosition;
+
+                        Vector3 normal = new Vector3(-1, 0, 0);
+                        sphereList[i].mSphereVelocity = (sphereList[i].mSphereVelocity - 2 * Vector3.Dot(normal, sphereList[i].mSphereVelocity) * normal) * coefficientOfRestitution;
                     }
-                }
 
-                #endregion
-
-                #region CylinderCollide
-
-                for (int j = 0; j < cylinderArray.Length; j++)
-                {
-
-                }
-
-                #endregion
-
-                #region SphereOfDoomCollide
-
-                int uLightPositionLocation4 = GL.GetUniformLocation(mShader.ShaderProgramID, "uLight[2].Position");
-                int uAmbientLightLocation4 = GL.GetUniformLocation(mShader.ShaderProgramID, "uLight[2].AmbientLight");
-                int uDiffuseLightLocation4 = GL.GetUniformLocation(mShader.ShaderProgramID, "uLight[2].DiffuseLight");
-                int uSpecularLightLocation4 = GL.GetUniformLocation(mShader.ShaderProgramID, "uLight[2].SpecularLight");
-
-                if (lightBool || Math.Sqrt(Math.Pow((sphereList[i].mSpherePosition.X - sphereOfDoom.mSpherePosition.X), 2) + Math.Pow((sphereList[i].mSpherePosition.Y - sphereOfDoom.mSpherePosition.Y), 2) + Math.Pow((sphereList[i].mSpherePosition.Z - sphereOfDoom.mSpherePosition.Z), 2)) <= (sphereList[i].mSphereRadius + sphereOfDoom.mSphereRadius))
-                {
-                    lightBool = true;
-
-                    Vector4 lightPosition2 = Vector4.Transform(new Vector4(sphereList[i].mSpherePosition, 1), mView);
-                    GL.Uniform4(uLightPositionLocation4, lightPosition2);
-
-                    Vector3 colour4 = new Vector3(1, 0, 0);
-                    GL.Uniform3(uAmbientLightLocation4, colour4);
-                    GL.Uniform3(uDiffuseLightLocation4, colour4);
-                    GL.Uniform3(uSpecularLightLocation4, colour4);
-                }
-                else
-                {
-                    Vector3 colour4 = new Vector3(0, 0, 0);
-                    GL.Uniform3(uAmbientLightLocation4, colour4);
-                    GL.Uniform3(uDiffuseLightLocation4, colour4);
-                    GL.Uniform3(uSpecularLightLocation4, colour4);
-                }
-
-                #endregion
-
-                #region WallCollide
-
-                if (sphereList[i].mSpherePosition.X + sphereList[i].mSphereRadius >= 0.2 || sphereList[i].mSpherePosition.X - sphereList[i].mSphereRadius <= -0.2)
-                {
-                    Vector3 normal = new Vector3(-1, 0, 0);
-                    sphereList[i].mSphereVelocity = (sphereList[i].mSphereVelocity - 2 * Vector3.Dot(normal, sphereList[i].mSphereVelocity) * normal) * coefficientOfRestitution;
-
-                    sphereList[i].mSpherePosition = mPreviousSpherePosition;
-                }
-
-                if (sphereList[i].mSpherePosition.Y - sphereList[i].mSphereRadius >= 0.8)
-                {
-                    Vector3 normal = new Vector3(0, -1, 0);
-                    sphereList[i].mSphereVelocity = (sphereList[i].mSphereVelocity - 2 * Vector3.Dot(normal, sphereList[i].mSphereVelocity) * normal) * coefficientOfRestitution;
-
-                    sphereList[i].mSpherePosition = mPreviousSpherePosition;
-                }
-
-                if (sphereList[i].mSpherePosition.Y + sphereList[i].mSphereRadius <= -0.8)
-                {
-                    Vector3 temporaryPosition = sphereList[i].mSpherePosition;
-                    Vector3 temporaryVelocity = sphereList[i].mSphereVelocity;
-
-                    sphereList[i].mSphereVelocity.X = temporaryVelocity.Y;
-                    sphereList[i].mSphereVelocity.Y = temporaryVelocity.X;
-
-                    sphereList[i].mSpherePosition.Y = 0.6f - sphereList[i].mSpherePosition.X;
-                    sphereList[i].mSpherePosition.X = 0.2f - sphereList[i].mSphereRadius;
-                }
-
-                if (sphereList[i].mSpherePosition.Z + sphereList[i].mSphereRadius >= 0.2 || sphereList[i].mSpherePosition.Z - sphereList[i].mSphereRadius <= -0.2)
-                {
-                    Vector3 normal = new Vector3(0, 0, -1);
-                    sphereList[i].mSphereVelocity = (sphereList[i].mSphereVelocity - 2 * Vector3.Dot(normal, sphereList[i].mSphereVelocity) * normal) * coefficientOfRestitution;
-
-                    sphereList[i].mSpherePosition = mPreviousSpherePosition;
-                }
-
-                #endregion
-
-                #region Velocity2
-
-                if (!simulationBool)
-                {
-                    if (speedBool)
+                    if (sphereList[i].mSpherePosition.Y - sphereList[i].mSphereRadius >= 0.8)
                     {
-                        sphereList[i].mSphereVelocity.Y = (sphereList[i].mSphereVelocity.Y + accelerationDueToGravity * timestep) / 2;
+                        sphereList[i].mSpherePosition = mPreviousSpherePosition;
+
+                        Vector3 normal = new Vector3(0, -1, 0);
+                        sphereList[i].mSphereVelocity = (sphereList[i].mSphereVelocity - 2 * Vector3.Dot(normal, sphereList[i].mSphereVelocity) * normal) * coefficientOfRestitution;
                     }
-                    else
+
+                    if (sphereList[i].mSpherePosition.Y + sphereList[i].mSphereRadius <= -0.8)
                     {
-                        sphereList[i].mSphereVelocity.Y = sphereList[i].mSphereVelocity.Y + accelerationDueToGravity * timestep;
+                        sphereList[i].mSpherePosition = mPreviousSpherePosition;
+
+                        Vector3 temporaryVelocity = sphereList[i].mSphereVelocity;
+                        Vector3 temporaryPosition = sphereList[i].mSpherePosition;
+
+                        sphereList[i].mSphereVelocity.X = temporaryVelocity.Y;
+                        sphereList[i].mSphereVelocity.Y = temporaryVelocity.X;
+
+                        sphereList[i].mSpherePosition.Y = 0.6f - sphereList[i].mSpherePosition.X;
+                        sphereList[i].mSpherePosition.X = 0.2f - sphereList[i].mSphereRadius;
                     }
+
+                    if (sphereList[i].mSpherePosition.Z + sphereList[i].mSphereRadius >= 0.2 || sphereList[i].mSpherePosition.Z - sphereList[i].mSphereRadius <= -0.2)
+                    {
+                        sphereList[i].mSpherePosition = mPreviousSpherePosition;
+
+                        Vector3 normal = new Vector3(0, 0, -1);
+                        sphereList[i].mSphereVelocity = (sphereList[i].mSphereVelocity - 2 * Vector3.Dot(normal, sphereList[i].mSphereVelocity) * normal) * coefficientOfRestitution;
+                    }
+
+                    #endregion
+
+                    #region CylinderCollide
+
+                    for (int j = 0; j < 3; j++)
+                    {
+                        double cylinderDistance1 = Math.Sqrt(Math.Pow((sphereList[i].mSpherePosition.Y - cylinderArray[j].mCylinderPosition.Y), 2));
+                        double cylinderRadius1 = sphereList[i].mSphereRadius + cylinderArray[j].mCylinderRadius;
+
+                        if ((cylinderDistance1 <= cylinderRadius1) && (sphereList[i].mSpherePosition.X > (cylinderArray[j].mCylinderPosition.X - cylinderArray[j].mCylinderRadius) && sphereList[i].mSpherePosition.X < (cylinderArray[j].mCylinderPosition.X + cylinderArray[j].mCylinderRadius)))
+                        {
+                            sphereList[i].mSpherePosition = mPreviousSpherePosition;
+
+                            Vector3 normal = (sphereList[i].mSpherePosition - cylinderArray[j].mCylinderPosition).Normalized();
+                            sphereList[i].mSphereVelocity = sphereList[i].mSphereVelocity - 2 * Vector3.Dot(normal, sphereList[i].mSphereVelocity) * normal;
+                        }
+                    }
+
+                    double cylinderDistance2 = Math.Sqrt(Math.Pow((sphereList[i].mSpherePosition.Y - cylinderArray[3].mCylinderPosition.Y), 2));
+                    double cylinderRadius2 = sphereList[i].mSphereRadius + cylinderArray[3].mCylinderRadius;
+
+                    if ((cylinderDistance2 <= cylinderRadius2) && (sphereList[i].mSpherePosition.Z > (cylinderArray[3].mCylinderPosition.Z - cylinderArray[3].mCylinderRadius) && sphereList[i].mSpherePosition.Z < (cylinderArray[3].mCylinderPosition.Z + cylinderArray[3].mCylinderRadius)))
+                    {
+                        sphereList[i].mSpherePosition = mPreviousSpherePosition;
+
+                        Vector3 normal = (sphereList[i].mSpherePosition - cylinderArray[3].mCylinderPosition).Normalized();
+                        sphereList[i].mSphereVelocity = sphereList[i].mSphereVelocity - 2 * Vector3.Dot(normal, sphereList[i].mSphereVelocity) * normal;
+                    }
+
+                    #endregion
+
+                    #region SphereCollide
+
+                    for (int j = 0; j < i; j++)
+                    {
+                        if (j != i && (Math.Sqrt(Math.Pow((sphereList[i].mSpherePosition.X - sphereList[j].mSpherePosition.X), 2) + Math.Pow((sphereList[i].mSpherePosition.Y - sphereList[j].mSpherePosition.Y), 2) + Math.Pow((sphereList[i].mSpherePosition.Z - sphereList[j].mSpherePosition.Z), 2)) <= (sphereList[i].mSphereRadius + sphereList[j].mSphereRadius)))
+                        {
+                            sphereList[i].mSpherePosition = mPreviousSpherePosition;
+
+                            Vector3 temporaryVelocity = sphereList[i].mSphereVelocity;
+
+                            sphereList[i].mSphereVelocity = (Vector3.Multiply(sphereList[i].mSphereVelocity, ((sphereList[i].mSphereMass - sphereList[j].mSphereMass) / (sphereList[i].mSphereMass + sphereList[j].mSphereMass))) + Vector3.Multiply(sphereList[j].mSphereVelocity, ((2 * sphereList[j].mSphereMass) / (sphereList[i].mSphereMass + sphereList[j].mSphereMass)))) * coefficientOfRestitution;
+                            sphereList[j].mSphereVelocity = (Vector3.Multiply(sphereList[j].mSphereVelocity, ((sphereList[j].mSphereMass - sphereList[i].mSphereMass) / (sphereList[j].mSphereMass + sphereList[i].mSphereMass))) + Vector3.Multiply(temporaryVelocity, ((2 * sphereList[i].mSphereMass) / (sphereList[j].mSphereMass + sphereList[i].mSphereMass)))) * coefficientOfRestitution;
+                        }
+                    }
+
+                    #endregion
+
+                    #region Velocity2
+
+                    if (!simulationBool)
+                    {
+                        if (speedBool)
+                        {
+                            sphereList[i].mSphereVelocity.Y = (sphereList[i].mSphereVelocity.Y + accelerationDueToGravity * timestep) / 2;
+                        }
+                        else
+                        {
+                            sphereList[i].mSphereVelocity.Y = sphereList[i].mSphereVelocity.Y + accelerationDueToGravity * timestep;
+                        }
+                    }
+
+                    #endregion
+
+                    #region SphereOfDoomCollide
+
+                    int uLightPositionLocation4 = GL.GetUniformLocation(mShader.ShaderProgramID, "uLight[3].Position");
+                    int uAmbientLightLocation4 = GL.GetUniformLocation(mShader.ShaderProgramID, "uLight[3].AmbientLight");
+                    int uDiffuseLightLocation4 = GL.GetUniformLocation(mShader.ShaderProgramID, "uLight[3].DiffuseLight");
+                    int uSpecularLightLocation4 = GL.GetUniformLocation(mShader.ShaderProgramID, "uLight[3].SpecularLight");
+
+                    double sphereDistance = Math.Sqrt(Math.Pow((sphereList[i].mSpherePosition.X - sphereOfDoom.mSpherePosition.X), 2) + Math.Pow((sphereList[i].mSpherePosition.Y - sphereOfDoom.mSpherePosition.Y), 2) + Math.Pow((sphereList[i].mSpherePosition.Z - sphereOfDoom.mSpherePosition.Z), 2));
+                    double sphereRadius = sphereList[i].mSphereRadius + sphereOfDoom.mSphereRadius;
+
+                    if (sphereDistance <= sphereRadius)
+                    {
+                        Vector4 lightPosition2 = Vector4.Transform(new Vector4(sphereList[i].mSpherePosition, 1), mView);
+                        GL.Uniform4(uLightPositionLocation4, lightPosition2);
+
+                        Vector3 colour4 = new Vector3(1, 0, 0);
+                        GL.Uniform3(uAmbientLightLocation4, colour4);
+                        GL.Uniform3(uDiffuseLightLocation4, colour4);
+                        GL.Uniform3(uSpecularLightLocation4, colour4);
+
+                        if (sphereList[i].mSphereRadius - (sphereRadius - sphereDistance) > 0)
+                        {
+                            if (sphereList[i].mSpherePosition.X > 0)
+                            {
+                                sphereList[i].mSpherePosition.X = sphereList[i].mSpherePosition.X + (float)(2 * (sphereRadius - sphereDistance));
+                            }
+                            else
+                            {
+                                if (sphereList[i].mSpherePosition.X < 0)
+                                {
+                                    sphereList[i].mSpherePosition.X = sphereList[i].mSpherePosition.X - (float)(2 * (sphereRadius - sphereDistance));
+                                }
+                            }
+
+                            if (sphereList[i].mSpherePosition.Z > 0)
+                            {
+                                sphereList[i].mSpherePosition.Z = sphereList[i].mSpherePosition.Z + (float)(2 * (sphereRadius - sphereDistance));
+                            }
+                            else
+                            {
+                                if (sphereList[i].mSpherePosition.Z < 0)
+                                {
+                                    sphereList[i].mSpherePosition.Z = sphereList[i].mSpherePosition.Z - (float)(2 * (sphereRadius - sphereDistance));
+                                }
+                            }
+
+                            sphereList[i].mSphereRadius = sphereList[i].mSphereRadius - (float)(sphereRadius - sphereDistance);
+                        }
+                        else
+                        {
+                            if (randomSphere == i)
+                            {
+                                randomSphere = random.Next(0, (sphereList.Count - 1));
+                            }
+                            else
+                            {
+                                if (randomSphere > i)
+                                {
+                                    randomSphere = randomSphere - 1;
+                                }
+                            }
+
+                            for (int j = i; j < sphereList.Count - 1; j++)
+                            {
+                                sphereList[j] = sphereList[j + 1];
+                            }
+
+                            sphereList.RemoveAt(sphereList.Count - 1);
+                        }
+                    }
+
+                    #endregion
                 }
 
-                #endregion
+                base.OnUpdateFrame(e);
             }
-
-            #region AddSphere
-
-            if (ellapsedTime > randomEllapsedTime)
-            {
-                AddToList();
-
-                ellapsedTime = 0;
-                randomEllapsedTime = random.Next(0, 1001);
-                randomEllapsedTime = randomEllapsedTime / 1000;
-            }
-
-            #endregion
-
-            base.OnUpdateFrame(e);
         }
 
         protected override void OnRenderFrame(FrameEventArgs e)
         {
-            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-
-            int uModel = GL.GetUniformLocation(mShader.ShaderProgramID, "uModel");
-            int uAmbientReflectivityLocation = GL.GetUniformLocation(mShader.ShaderProgramID, "uMaterial.AmbientReflectivity");
-            int uDiffuseReflectivityLocation = GL.GetUniformLocation(mShader.ShaderProgramID, "uMaterial.DiffuseReflectivity");
-            int uSpecularReflectivityLocation = GL.GetUniformLocation(mShader.ShaderProgramID, "uMaterial.SpecularReflectivity");
-            int uShininessLocation = GL.GetUniformLocation(mShader.ShaderProgramID, "uMaterial.Shininess");
-
-            #region World
-
-            
-
-            #endregion
-
-            #region Box
-
-            GL.Enable(EnableCap.CullFace);
-
-            #region EmitterBox
-
-            Matrix4 m1 = mEmitterBoxModel * mWorld;
-            uModel = GL.GetUniformLocation(mShader.ShaderProgramID, "uModel");
-            GL.UniformMatrix4(uModel, true, ref m1);
-
-            Vector3 emitterBoxAmbientReflectivity = new Vector3(0.2125f, 0.1275f, 0.054f);
-            GL.Uniform3(uAmbientReflectivityLocation, emitterBoxAmbientReflectivity);
-
-            Vector3 emitterBoxDiffuseReflectivity = new Vector3(0.714f, 0.4284f, 0.18144f);
-            GL.Uniform3(uDiffuseReflectivityLocation, emitterBoxDiffuseReflectivity);
-
-            Vector3 emitterBoxSpecularReflectivity = new Vector3(0.393548f, 0.271906f, 0.166721f);
-            GL.Uniform3(uSpecularReflectivityLocation, emitterBoxSpecularReflectivity);
-
-            float emitterBoxShininess = 76.8f;
-            GL.Uniform1(uShininessLocation, emitterBoxShininess);
-
-            GL.BindVertexArray(mVAO_IDs[1]);
-            GL.DrawElements(PrimitiveType.Triangles, mEmitterBoxModelUtility.Indices.Length, DrawElementsType.UnsignedInt, 0);
-
-            #endregion
-
-            #region GridBox1
-
-            Matrix4 m2 = mGridBox1Model * mWorld;
-            uModel = GL.GetUniformLocation(mShader.ShaderProgramID, "uModel");
-            GL.UniformMatrix4(uModel, true, ref m2);
-
-            Vector3 GridBox1AmbientReflectivity = new Vector3(0.2125f, 0.1275f, 0.054f);
-            GL.Uniform3(uAmbientReflectivityLocation, GridBox1AmbientReflectivity);
-
-            Vector3 GridBox1DiffuseReflectivity = new Vector3(0.714f, 0.4284f, 0.18144f);
-            GL.Uniform3(uDiffuseReflectivityLocation, GridBox1DiffuseReflectivity);
-
-            Vector3 GridBox1SpecularReflectivity = new Vector3(0.393548f, 0.271906f, 0.166721f);
-            GL.Uniform3(uSpecularReflectivityLocation, GridBox1SpecularReflectivity);
-
-            float GridBox1Shininess = 76.8f;
-            GL.Uniform1(uShininessLocation, GridBox1Shininess);
-
-            GL.BindVertexArray(mVAO_IDs[2]);
-            GL.DrawElements(PrimitiveType.Triangles, mGridBox1ModelUtility.Indices.Length, DrawElementsType.UnsignedInt, 0);
-
-            #endregion
-
-            #region GridBox2
-
-            Matrix4 m3 = mGridBox2Model * mWorld;
-            uModel = GL.GetUniformLocation(mShader.ShaderProgramID, "uModel");
-            GL.UniformMatrix4(uModel, true, ref m3);
-
-            Vector3 GridBox2AmbientReflectivity = new Vector3(0.2125f, 0.1275f, 0.054f);
-            GL.Uniform3(uAmbientReflectivityLocation, GridBox2AmbientReflectivity);
-
-            Vector3 GridBox2DiffuseReflectivity = new Vector3(0.714f, 0.4284f, 0.18144f);
-            GL.Uniform3(uDiffuseReflectivityLocation, GridBox2DiffuseReflectivity);
-
-            Vector3 GridBox2SpecularReflectivity = new Vector3(0.393548f, 0.271906f, 0.166721f);
-            GL.Uniform3(uSpecularReflectivityLocation, GridBox2SpecularReflectivity);
-
-            float GridBox2Shininess = 76.8f;
-            GL.Uniform1(uShininessLocation, GridBox2Shininess);
-
-            GL.BindVertexArray(mVAO_IDs[3]);
-            GL.DrawElements(PrimitiveType.Triangles, mGridBox2ModelUtility.Indices.Length, DrawElementsType.UnsignedInt, 0);
-
-            #endregion
-
-            #region SphereOfDoomBox
-
-            Matrix4 m4 = mSphereOfDoomBoxModel * mWorld;
-            uModel = GL.GetUniformLocation(mShader.ShaderProgramID, "uModel");
-            GL.UniformMatrix4(uModel, true, ref m4);
-
-            Vector3 SphereOfDoomBoxAmbientReflectivity = new Vector3(0.2125f, 0.1275f, 0.054f);
-            GL.Uniform3(uAmbientReflectivityLocation, SphereOfDoomBoxAmbientReflectivity);
-
-            Vector3 SphereOfDoomBoxDiffuseReflectivity = new Vector3(0.714f, 0.4284f, 0.18144f);
-            GL.Uniform3(uDiffuseReflectivityLocation, SphereOfDoomBoxDiffuseReflectivity);
-
-            Vector3 SphereOfDoomBoxSpecularReflectivity = new Vector3(0.393548f, 0.271906f, 0.166721f);
-            GL.Uniform3(uSpecularReflectivityLocation, SphereOfDoomBoxSpecularReflectivity);
-
-            float SphereOfDoomBoxShininess = 76.8f;
-            GL.Uniform1(uShininessLocation, SphereOfDoomBoxShininess);
-
-            GL.BindVertexArray(mVAO_IDs[4]);
-            GL.DrawElements(PrimitiveType.Triangles, mSphereOfDoomBoxModelUtility.Indices.Length, DrawElementsType.UnsignedInt, 0);
-
-            #endregion
-
-            GL.Disable(EnableCap.CullFace);
-
-            #endregion
-
-            #region SphereOfDoom
-
-            lightBool = false;
-
-            Matrix4 m5 = Matrix4.CreateScale(sphereOfDoom.mSphereRadius) * Matrix4.CreateTranslation(sphereOfDoom.mSpherePosition) * mWorld;
-            uModel = GL.GetUniformLocation(mShader.ShaderProgramID, "uModel");
-            GL.UniformMatrix4(uModel, true, ref m5);
-
-            Vector3 SphereOfDoomAmbientReflectivity = new Vector3(0.2125f, 0.1275f, 0.054f);
-            GL.Uniform3(uAmbientReflectivityLocation, SphereOfDoomAmbientReflectivity);
-
-            Vector3 SphereOfDoomDiffuseReflectivity = new Vector3(0.714f, 0.4284f, 0.18144f);
-            GL.Uniform3(uDiffuseReflectivityLocation, SphereOfDoomDiffuseReflectivity);
-
-            Vector3 SphereOfDoomSpecularReflectivity = new Vector3(0.393548f, 0.271906f, 0.166721f);
-            GL.Uniform3(uSpecularReflectivityLocation, SphereOfDoomSpecularReflectivity);
-
-            float SphereOfDoomShininess = 76.8f;
-            GL.Uniform1(uShininessLocation, SphereOfDoomShininess);
-
-            GL.BindVertexArray(mVAO_IDs[7]);
-            GL.DrawElements(PrimitiveType.Triangles, mSphereOfDoomModelUtility.Indices.Length, DrawElementsType.UnsignedInt, 0);
-
-            #endregion
-
-            #region Cylinder
-
-            for (int i = 0; i < cylinderArray.Length; i++)
+            if (updateBool)
             {
-                Matrix4 m6 = Matrix4.CreateScale(cylinderArray[i].mCylinderScale) * Matrix4.CreateRotationX(cylinderArray[i].mCylinderRotation.X) * Matrix4.CreateRotationY(cylinderArray[i].mCylinderRotation.Y) * Matrix4.CreateScale(cylinderArray[i].mCylinderRadius) * Matrix4.CreateTranslation(cylinderArray[i].mCylinderPosition) * mWorld;
+                updateBool = false;
+
+                GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+
+                int uModel = GL.GetUniformLocation(mShader.ShaderProgramID, "uModel");
+                int uModel2 = GL.GetUniformLocation(mShader2.ShaderProgramID, "uModel");
+                int uAmbientReflectivityLocation = GL.GetUniformLocation(mShader.ShaderProgramID, "uMaterial.AmbientReflectivity");
+                int uAmbientReflectivityLocation2 = GL.GetUniformLocation(mShader2.ShaderProgramID, "uMaterial.AmbientReflectivity");
+                int uDiffuseReflectivityLocation = GL.GetUniformLocation(mShader.ShaderProgramID, "uMaterial.DiffuseReflectivity");
+                int uDiffuseReflectivityLocation2 = GL.GetUniformLocation(mShader2.ShaderProgramID, "uMaterial.DiffuseReflectivity");
+                int uSpecularReflectivityLocation = GL.GetUniformLocation(mShader.ShaderProgramID, "uMaterial.SpecularReflectivity");
+                int uSpecularReflectivityLocation2 = GL.GetUniformLocation(mShader2.ShaderProgramID, "uMaterial.SpecularReflectivity");
+                int uShininessLocation = GL.GetUniformLocation(mShader.ShaderProgramID, "uMaterial.Shininess");
+                int uShininessLocation2 = GL.GetUniformLocation(mShader2.ShaderProgramID, "uMaterial.Shininess");
+                int uColourLocation = GL.GetUniformLocation(mShader.ShaderProgramID, "uColour");
+                int uColourLocation2 = GL.GetUniformLocation(mShader2.ShaderProgramID, "uColour");
+
+                #region World
+
+
+
+                #endregion
+
+                #region Box
+
+                GL.Enable(EnableCap.CullFace);
+
+                //GL.ActiveShaderProgram(mShader.ShaderProgramID, mShader.ShaderProgramID);
+
+                GL.Uniform4(uColourLocation, Color4.Black);
+                GL.Uniform4(uColourLocation2, Color4.Transparent);
+
+                #region EmitterBox
+
+                Matrix4 m1 = mEmitterBoxModel * mWorld;
                 uModel = GL.GetUniformLocation(mShader.ShaderProgramID, "uModel");
-                GL.UniformMatrix4(uModel, true, ref m6);
+                GL.UniformMatrix4(uModel, true, ref m1);
 
-                Vector3 CylinderAmbientReflectivity = new Vector3(0.2125f, 0.1275f, 0.054f);
-                GL.Uniform3(uAmbientReflectivityLocation, CylinderAmbientReflectivity);
+                Vector3 emitterBoxAmbientReflectivity = new Vector3(0.2125f, 0.1275f, 0.054f);
+                GL.Uniform3(uAmbientReflectivityLocation, emitterBoxAmbientReflectivity);
 
-                Vector3 CylinderDiffuseReflectivity = new Vector3(0.714f, 0.4284f, 0.18144f);
-                GL.Uniform3(uDiffuseReflectivityLocation, CylinderDiffuseReflectivity);
+                Vector3 emitterBoxDiffuseReflectivity = new Vector3(0.714f, 0.4284f, 0.18144f);
+                GL.Uniform3(uDiffuseReflectivityLocation, emitterBoxDiffuseReflectivity);
 
-                Vector3 CylinderSpecularReflectivity = new Vector3(0.393548f, 0.271906f, 0.166721f);
-                GL.Uniform3(uSpecularReflectivityLocation, CylinderSpecularReflectivity);
+                Vector3 emitterBoxSpecularReflectivity = new Vector3(0.393548f, 0.271906f, 0.166721f);
+                GL.Uniform3(uSpecularReflectivityLocation, emitterBoxSpecularReflectivity);
 
-                float CylinderShininess = 76.8f;
-                GL.Uniform1(uShininessLocation, CylinderShininess);
+                float emitterBoxShininess = 76.8f;
+                GL.Uniform1(uShininessLocation, emitterBoxShininess);
 
-                GL.BindVertexArray(mVAO_IDs[6]);
-                GL.DrawElements(PrimitiveType.Triangles, mCylinderModelUtility.Indices.Length, DrawElementsType.UnsignedInt, 0);
-            }
+                GL.BindVertexArray(mVAO_IDs[1]);
+                GL.DrawElements(PrimitiveType.Triangles, mEmitterBoxModelUtility.Indices.Length, DrawElementsType.UnsignedInt, 0);
 
-            #endregion
+                #endregion
 
-            #region Sphere
+                #region GridBox1
 
-            for (int i = 0; i < sphereList.Count; i++)
-            {
-                Matrix4 m7 = Matrix4.CreateScale(sphereList[i].mSphereRadius) * Matrix4.CreateTranslation(sphereList[i].mSpherePosition) * mWorld;
+                Matrix4 m2 = mGridBox1Model * mWorld;
                 uModel = GL.GetUniformLocation(mShader.ShaderProgramID, "uModel");
-                GL.UniformMatrix4(uModel, true, ref m7);
+                GL.UniformMatrix4(uModel, true, ref m2);
 
-                Vector3 SphereAmbientReflectivity = new Vector3(0.2125f, 0.1275f, 0.054f);
-                GL.Uniform3(uAmbientReflectivityLocation, SphereAmbientReflectivity);
+                Vector3 GridBox1AmbientReflectivity = new Vector3(0.2125f, 0.1275f, 0.054f);
+                GL.Uniform3(uAmbientReflectivityLocation, GridBox1AmbientReflectivity);
 
-                Vector3 SphereDiffuseReflectivity = new Vector3(0.714f, 0.4284f, 0.18144f);
-                GL.Uniform3(uDiffuseReflectivityLocation, SphereDiffuseReflectivity);
+                Vector3 GridBox1DiffuseReflectivity = new Vector3(0.714f, 0.4284f, 0.18144f);
+                GL.Uniform3(uDiffuseReflectivityLocation, GridBox1DiffuseReflectivity);
 
-                Vector3 SphereSpecularReflectivity = new Vector3(0.393548f, 0.271906f, 0.166721f);
-                GL.Uniform3(uSpecularReflectivityLocation, SphereSpecularReflectivity);
+                Vector3 GridBox1SpecularReflectivity = new Vector3(0.393548f, 0.271906f, 0.166721f);
+                GL.Uniform3(uSpecularReflectivityLocation, GridBox1SpecularReflectivity);
 
-                float SphereShininess = 76.8f;
-                GL.Uniform1(uShininessLocation, SphereShininess);
+                float GridBox1Shininess = 76.8f;
+                GL.Uniform1(uShininessLocation, GridBox1Shininess);
+
+                GL.BindVertexArray(mVAO_IDs[2]);
+                GL.DrawElements(PrimitiveType.Triangles, mGridBox1ModelUtility.Indices.Length, DrawElementsType.UnsignedInt, 0);
+
+                #endregion
+
+                #region GridBox2
+
+                Matrix4 m3 = mGridBox2Model * mWorld;
+                uModel = GL.GetUniformLocation(mShader.ShaderProgramID, "uModel");
+                GL.UniformMatrix4(uModel, true, ref m3);
+
+                Vector3 GridBox2AmbientReflectivity = new Vector3(0.2125f, 0.1275f, 0.054f);
+                GL.Uniform3(uAmbientReflectivityLocation, GridBox2AmbientReflectivity);
+
+                Vector3 GridBox2DiffuseReflectivity = new Vector3(0.714f, 0.4284f, 0.18144f);
+                GL.Uniform3(uDiffuseReflectivityLocation, GridBox2DiffuseReflectivity);
+
+                Vector3 GridBox2SpecularReflectivity = new Vector3(0.393548f, 0.271906f, 0.166721f);
+                GL.Uniform3(uSpecularReflectivityLocation, GridBox2SpecularReflectivity);
+
+                float GridBox2Shininess = 76.8f;
+                GL.Uniform1(uShininessLocation, GridBox2Shininess);
+
+                GL.BindVertexArray(mVAO_IDs[3]);
+                GL.DrawElements(PrimitiveType.Triangles, mGridBox2ModelUtility.Indices.Length, DrawElementsType.UnsignedInt, 0);
+
+                #endregion
+
+                #region SphereOfDoomBox
+
+                Matrix4 m4 = mSphereOfDoomBoxModel * mWorld;
+                uModel = GL.GetUniformLocation(mShader.ShaderProgramID, "uModel");
+                GL.UniformMatrix4(uModel, true, ref m4);
+
+                Vector3 SphereOfDoomBoxAmbientReflectivity = new Vector3(0.2125f, 0.1275f, 0.054f);
+                GL.Uniform3(uAmbientReflectivityLocation, SphereOfDoomBoxAmbientReflectivity);
+
+                Vector3 SphereOfDoomBoxDiffuseReflectivity = new Vector3(0.714f, 0.4284f, 0.18144f);
+                GL.Uniform3(uDiffuseReflectivityLocation, SphereOfDoomBoxDiffuseReflectivity);
+
+                Vector3 SphereOfDoomBoxSpecularReflectivity = new Vector3(0.393548f, 0.271906f, 0.166721f);
+                GL.Uniform3(uSpecularReflectivityLocation, SphereOfDoomBoxSpecularReflectivity);
+
+                float SphereOfDoomBoxShininess = 76.8f;
+                GL.Uniform1(uShininessLocation, SphereOfDoomBoxShininess);
+
+                GL.BindVertexArray(mVAO_IDs[4]);
+                GL.DrawElements(PrimitiveType.Triangles, mSphereOfDoomBoxModelUtility.Indices.Length, DrawElementsType.UnsignedInt, 0);
+
+                #endregion
+
+                GL.Disable(EnableCap.CullFace);
+
+                #endregion
+
+                //GL.ActiveShaderProgram(mShader2.ShaderProgramID, mShader2.ShaderProgramID);
+
+                #region Cylinder
+
+                GL.Uniform4(uColourLocation, Color4.Black);
+                GL.Uniform4(uColourLocation2, Color4.Black);
+
+                for (int i = 0; i < cylinderArray.Length; i++)
+                {
+                    Matrix4 m6 = Matrix4.CreateScale(cylinderArray[i].mCylinderScale) * Matrix4.CreateRotationX(cylinderArray[i].mCylinderRotation.X) * Matrix4.CreateRotationY(cylinderArray[i].mCylinderRotation.Y) * Matrix4.CreateScale(cylinderArray[i].mCylinderRadius) * Matrix4.CreateTranslation(cylinderArray[i].mCylinderPosition) * mWorld;
+                    uModel = GL.GetUniformLocation(mShader2.ShaderProgramID, "uModel");
+                    GL.UniformMatrix4(uModel2, true, ref m6);
+
+                    Vector3 CylinderAmbientReflectivity = new Vector3(0.1f, 0.1f, 0.1f);
+                    GL.Uniform3(uAmbientReflectivityLocation2, CylinderAmbientReflectivity);
+
+                    Vector3 CylinderDiffuseReflectivity = new Vector3(0, 0, 0);
+                    GL.Uniform3(uDiffuseReflectivityLocation2, CylinderDiffuseReflectivity);
+
+                    Vector3 CylinderSpecularReflectivity = new Vector3(0, 0, 0);
+                    GL.Uniform3(uSpecularReflectivityLocation2, CylinderSpecularReflectivity);
+
+                    float CylinderShininess = 0;
+                    GL.Uniform1(uShininessLocation2, CylinderShininess);
+
+                    GL.BindVertexArray(mVAO_IDs[6]);
+                    GL.DrawElements(PrimitiveType.Triangles, mCylinderModelUtility.Indices.Length, DrawElementsType.UnsignedInt, 0);
+                }
+
+                #endregion
+
+                #region SphereOfDoom
+
+                GL.Uniform4(uColourLocation, Color4.DodgerBlue);
+                GL.Uniform4(uColourLocation2, Color4.DodgerBlue);
+
+                Matrix4 m5 = Matrix4.CreateScale(sphereOfDoom.mSphereRadius) * Matrix4.CreateTranslation(sphereOfDoom.mSpherePosition) * mWorld;
+                uModel = GL.GetUniformLocation(mShader2.ShaderProgramID, "uModel");
+                GL.UniformMatrix4(uModel2, true, ref m5);
+
+                Vector3 SphereOfDoomAmbientReflectivity = new Vector3(0.1f, 0.1f, 0.1f);
+                GL.Uniform3(uAmbientReflectivityLocation2, SphereOfDoomAmbientReflectivity);
+
+                Vector3 SphereOfDoomDiffuseReflectivity = new Vector3(0, 0, 0);
+                GL.Uniform3(uDiffuseReflectivityLocation2, SphereOfDoomDiffuseReflectivity);
+
+                Vector3 SphereOfDoomSpecularReflectivity = new Vector3(0, 0, 0);
+                GL.Uniform3(uSpecularReflectivityLocation2, SphereOfDoomSpecularReflectivity);
+
+                float SphereOfDoomShininess = 0;
+                GL.Uniform1(uShininessLocation2, SphereOfDoomShininess);
 
                 GL.BindVertexArray(mVAO_IDs[7]);
-                GL.DrawElements(PrimitiveType.Triangles, mSphereModelUtility.Indices.Length, DrawElementsType.UnsignedInt, 0);
+                GL.DrawElements(PrimitiveType.Triangles, mSphereOfDoomModelUtility.Indices.Length, DrawElementsType.UnsignedInt, 0);
+
+                int uLightPositionLocation4 = GL.GetUniformLocation(mShader.ShaderProgramID, "uLight[3].Position");
+                int uAmbientLightLocation4 = GL.GetUniformLocation(mShader.ShaderProgramID, "uLight[3].AmbientLight");
+                int uDiffuseLightLocation4 = GL.GetUniformLocation(mShader.ShaderProgramID, "uLight[3].DiffuseLight");
+                int uSpecularLightLocation4 = GL.GetUniformLocation(mShader.ShaderProgramID, "uLight[3].SpecularLight");
+
+                Vector3 colour4 = new Vector3(0, 0, 0);
+                GL.Uniform3(uAmbientLightLocation4, colour4);
+                GL.Uniform3(uDiffuseLightLocation4, colour4);
+                GL.Uniform3(uSpecularLightLocation4, colour4);
+
+                #endregion
+
+                #region Sphere
+
+                for (int i = 0; i < sphereList.Count; i++)
+                {
+                    if (sphereList[i].mSphereBool)
+                    {
+                        GL.Uniform4(uColourLocation, Color4.ForestGreen);
+                        GL.Uniform4(uColourLocation2, Color4.ForestGreen);
+
+                        Vector3 SphereDiffuseReflectivity = new Vector3(0, 0, 0);
+                        GL.Uniform3(uDiffuseReflectivityLocation2, SphereDiffuseReflectivity);
+
+                        Vector3 SphereSpecularReflectivity = new Vector3(0, 0, 0);
+                        GL.Uniform3(uSpecularReflectivityLocation2, SphereSpecularReflectivity);
+
+                        float SphereShininess = 0;
+                        GL.Uniform1(uShininessLocation2, SphereShininess);
+                    }
+                    else
+                    {
+                        GL.Uniform4(uColourLocation, Color4.MediumPurple);
+                        GL.Uniform4(uColourLocation2, Color4.MediumPurple);
+
+                        Vector3 SphereDiffuseReflectivity = new Vector3(0.2f, 0.2f, 0.2f);
+                        GL.Uniform3(uDiffuseReflectivityLocation2, SphereDiffuseReflectivity);
+
+                        Vector3 SphereSpecularReflectivity = new Vector3(0.2f, 0.2f, 0.2f);
+                        GL.Uniform3(uSpecularReflectivityLocation2, SphereSpecularReflectivity);
+
+                        float SphereShininess = 2;
+                        GL.Uniform1(uShininessLocation2, SphereShininess);
+                    }
+
+                    Matrix4 m7 = Matrix4.CreateScale(sphereList[i].mSphereRadius) * Matrix4.CreateTranslation(sphereList[i].mSpherePosition) * mWorld;
+                    uModel = GL.GetUniformLocation(mShader2.ShaderProgramID, "uModel");
+                    GL.UniformMatrix4(uModel2, true, ref m7);
+
+                    Vector3 SphereAmbientReflectivity = new Vector3(0.1f, 0.1f, 0.1f);
+                    GL.Uniform3(uAmbientReflectivityLocation2, SphereAmbientReflectivity);
+
+                    GL.BindVertexArray(mVAO_IDs[7]);
+                    GL.DrawElements(PrimitiveType.Triangles, mSphereModelUtility.Indices.Length, DrawElementsType.UnsignedInt, 0);
+                }
+
+                #endregion
+
+                this.SwapBuffers();
+
+                base.OnRenderFrame(e);
             }
-
-            #endregion
-
-            this.SwapBuffers();
-
-            base.OnRenderFrame(e);
         }
 
         protected override void OnUnload(EventArgs e)
@@ -1130,6 +1297,7 @@ namespace Labs.ACW
             GL.DeleteVertexArrays(mVAO_IDs.Length, mVAO_IDs);
 
             mShader.Delete();
+            mShader2.Delete();
 
             base.OnUnload(e);
         }
