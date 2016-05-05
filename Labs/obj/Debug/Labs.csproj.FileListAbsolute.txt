@@ -95,9 +95,17 @@ C:\Users\Alex\Desktop\Programs\Coursework\08214\Labs\obj\Debug\Labs.csprojResolv
 G:\08214\Labs\bin\Debug\Lab5\11884091_1000345359997175_3654872641334187195_o - Copy.jpg
 G:\08214\Labs\bin\Debug\ACW\Shaders\fLighting.frag
 G:\08214\Labs\bin\Debug\ACW\Shaders\vPassThrough.vert
-Z:\08214\Labs\bin\Debug\Labs.exe.config
-Z:\08214\Labs\obj\Debug\Labs.exe
-Z:\08214\Labs\obj\Debug\Labs.pdb
+C:\Users\Alex\Desktop\Programs\Coursework\08214\Labs\bin\Debug\ACW\Shaders\fLighting.frag
+C:\Users\Alex\Desktop\Programs\Coursework\08214\Labs\bin\Debug\ACW\Shaders\vPassThrough.vert
+C:\Users\Alex\Desktop\Programs\Coursework\08214\Labs\bin\Debug\Lab5\11884091_1000345359997175_3654872641334187195_o - Copy.jpg
+C:\Users\Alex\Desktop\Programs\Coursework\08214\Labs\bin\Debug\ACW\Shaders\fLighting2.frag
+C:\Users\Alex\Desktop\Programs\Coursework\08214\Labs\bin\Debug\ACW\Shaders\vPassThrough2.vert
+C:\Users\Alex\Desktop\Programs\Coursework\08214\Labs\bin\Debug\Utility\Models\MiddleBox.sjg
+C:\Users\Alex\Desktop\Programs\Coursework\08214\Labs\bin\Debug\Utility\Models\BottomBox.sjg
+C:\Users\Alex\Desktop\Programs\Coursework\08214\Labs\bin\Debug\Utility\Models\TopBox.sjg
+C:\Users\Alex\Desktop\Programs\Coursework\08214\Labs\bin\Debug\ACW\MaxResDefault.jpg
+Z:\08214\Labs\bin\Debug\ACW\Shaders\fLighting.frag
+Z:\08214\Labs\bin\Debug\ACW\Shaders\vPassThrough.vert
 Z:\08214\Labs\bin\Debug\Lab2\Shaders\fSimple.frag
 Z:\08214\Labs\bin\Debug\Lab2\Shaders\vLab21.vert
 Z:\08214\Labs\bin\Debug\Lab2\Shaders\vLab22.vert
@@ -109,31 +117,19 @@ Z:\08214\Labs\bin\Debug\Lab5\Shaders\fTexture.frag
 Z:\08214\Labs\bin\Debug\Lab5\Shaders\vTexture.vert
 Z:\08214\Labs\bin\Debug\Lab1\Shaders\fSimple.frag
 Z:\08214\Labs\bin\Debug\Lab1\Shaders\vSimple.vert
-Z:\08214\Labs\bin\Debug\Utility\Models\cylinder.bin
+Z:\08214\Labs\bin\Debug\Utility\Models\Cylinder.bin
+Z:\08214\Labs\bin\Debug\Utility\Models\MiddleBox.sjg
+Z:\08214\Labs\bin\Debug\Utility\Models\BottomBox.sjg
+Z:\08214\Labs\bin\Debug\Utility\Models\TopBox.sjg
 Z:\08214\Labs\bin\Debug\Utility\Models\lab22model.sjg
 Z:\08214\Labs\bin\Debug\Utility\Models\model1.bin
 Z:\08214\Labs\bin\Debug\Utility\Models\model2.bin
 Z:\08214\Labs\bin\Debug\Utility\Models\model3.bin
-Z:\08214\Labs\bin\Debug\Utility\Models\sphere.bin
+Z:\08214\Labs\bin\Debug\Utility\Models\Sphere.bin
 Z:\08214\Labs\bin\Debug\Lab5\11884091_1000345359997175_3654872641334187195_o - Copy.jpg
+Z:\08214\Labs\bin\Debug\Labs.exe.config
 Z:\08214\Labs\bin\Debug\Labs.exe
 Z:\08214\Labs\bin\Debug\Labs.pdb
 Z:\08214\Labs\bin\Debug\OpenTK.dll
-Z:\08214\Labs\obj\Debug\Labs.csprojResolveAssemblyReference.cache
-C:\Users\Alex\Desktop\Programs\Coursework\08214\Labs\bin\Debug\ACW\Shaders\fLighting.frag
-C:\Users\Alex\Desktop\Programs\Coursework\08214\Labs\bin\Debug\ACW\Shaders\vPassThrough.vert
-C:\Users\Alex\Desktop\Programs\Coursework\08214\Labs\bin\Debug\Lab5\11884091_1000345359997175_3654872641334187195_o - Copy.jpg
-Z:\08214\Labs\bin\Debug\Utility\Models\MiddleBox.sjg
-Z:\08214\Labs\bin\Debug\Utility\Models\BottomBox.sjg
-Z:\08214\Labs\bin\Debug\Utility\Models\TopBox.sjg
-Z:\08214\Labs\bin\Debug\ACW\Shaders\fLighting.frag
-Z:\08214\Labs\bin\Debug\ACW\Shaders\vPassThrough.vert
-Z:\08214\Labs\bin\Debug\ACW\MaxResDefault.jpg
-C:\Users\Alex\Desktop\Programs\Coursework\08214\Labs\bin\Debug\ACW\Shaders\fLighting2.frag
-C:\Users\Alex\Desktop\Programs\Coursework\08214\Labs\bin\Debug\ACW\Shaders\vPassThrough2.vert
-C:\Users\Alex\Desktop\Programs\Coursework\08214\Labs\bin\Debug\Utility\Models\MiddleBox.sjg
-C:\Users\Alex\Desktop\Programs\Coursework\08214\Labs\bin\Debug\Utility\Models\BottomBox.sjg
-C:\Users\Alex\Desktop\Programs\Coursework\08214\Labs\bin\Debug\Utility\Models\TopBox.sjg
-C:\Users\Alex\Desktop\Programs\Coursework\08214\Labs\bin\Debug\ACW\MaxResDefault.jpg
-Z:\08214\Labs\bin\Debug\ACW\Shaders\fLighting2.frag
-Z:\08214\Labs\bin\Debug\ACW\Shaders\vPassThrough2.vert
+Z:\08214\Labs\obj\Debug\Labs.exe
+Z:\08214\Labs\obj\Debug\Labs.pdb
