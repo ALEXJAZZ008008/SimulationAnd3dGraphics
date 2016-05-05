@@ -40,6 +40,7 @@ namespace Labs.ACW
         {
             Static,
             User,
+            Mouse,
             Moving,
             Follow
         }
@@ -63,7 +64,7 @@ namespace Labs.ACW
 
         private Timer mTimer;
         private bool simulationBool;
-        private Vector3 accelerationDueToGravity;
+        private Vector3 accelerationDueToGravity, mouse;
         private float coefficientOfRestitution, ellapsedTime, randomEllapsedTime;
 
         #endregion
@@ -632,6 +633,7 @@ namespace Labs.ACW
             simulationBool = true;
 
             mWorld2 = mWorld;
+            mouse = new Vector3(0, 0, 0);
 
             mTimer = new Timer();
             mTimer.Start();
@@ -714,31 +716,12 @@ namespace Labs.ACW
                 }
             }
 
-            if (e.KeyChar == '1')
+            if (e.KeyChar == 'q' || e.KeyChar == 'Q')
             {
-                mWorld = mWorld2;
-                camera = Camera.Static;
-            }
-
-            if (e.KeyChar == '2')
-            {
-                mWorld = mWorld2;
-                camera = Camera.User;
-            }
-
-            if (e.KeyChar == '3')
-            {
-                mWorld = mWorld2;
-                camera = Camera.Moving;
-            }
-
-            if (e.KeyChar == '4')
-            {
-                mWorld = mWorld2;
-
-                randomSphere = random.Next(0, (sphereList.Count));
-
-                camera = Camera.Follow;
+                for (int i = 0; i < sphereList.Count; i++)
+                {
+                    sphereList[i].mSphereVelocity.Y = sphereList[i].mSphereVelocity.Y + 10;
+                }
             }
 
             if (e.KeyChar == 'e' || e.KeyChar == 'E')
@@ -750,6 +733,45 @@ namespace Labs.ACW
                 else
                 {
                     simulationBool = true;
+                }
+            }
+
+            if (e.KeyChar == '1')
+            {
+                mWorld = mWorld2;
+                camera = Camera.Static;
+            }
+            else
+            {
+                if (e.KeyChar == '2')
+                {
+                    mWorld = mWorld2;
+                    camera = Camera.User;
+                }
+                else
+                {
+                    if (e.KeyChar == '3')
+                    {
+                        mWorld = mWorld2;
+                        camera = Camera.Mouse;
+                    }
+                    else
+                    {
+                        if (e.KeyChar == '4')
+                        {
+                            mWorld = mWorld2;
+                            camera = Camera.Moving;
+                        }
+                        else
+                        {
+                            if (e.KeyChar == '5')
+                            {
+                                mWorld = mWorld2;
+                                randomSphere = random.Next(0, (sphereList.Count));
+                                camera = Camera.Follow;
+                            }
+                        }
+                    }
                 }
             }
 
@@ -788,12 +810,44 @@ namespace Labs.ACW
                 Matrix4 inverseTranslation = Matrix4.CreateTranslation(-t);
                 mWorld = mWorld * inverseTranslation * Matrix4.CreateRotationY(-0.025f) * translation;
             }
-
-            if (camera == Camera.Follow)
+            else
             {
-                mWorld.Row3 = new Vector4(-sphereList[randomSphere].mSpherePosition.X, -(sphereList[randomSphere].mSpherePosition.Y - 1.6f), -(sphereList[randomSphere].mSpherePosition.Z + 1), 1);
-            }
+                if (camera == Camera.Mouse)
+                {
+                    Vector3 previousMouse = mouse;
+                    mouse = new Vector3((Mouse.X - 400), (Mouse.Y - 300), Mouse.Wheel);
+                    float scale = mouse.Z;
 
+                    if (scale < 1)
+                    {
+                        if (scale == 0)
+                        {
+                            scale = -1;
+                        }
+
+                        scale = -1 / scale;
+                    }
+                    
+                    if (scale > 1)
+                    {
+                        if (scale > 5)
+                        {
+                            scale = scale / 2;
+                        }
+
+                        scale = scale / 2;
+                    }
+
+                    mWorld = mWorld * Matrix4.CreateTranslation(-((previousMouse.X - mouse.X) / (400 / scale)), ((previousMouse.Y - mouse.Y) / (400 / scale)), ((previousMouse.Z - mouse.Z) / 4));
+                }
+                else
+                {
+                    if (camera == Camera.Follow)
+                    {
+                        mWorld.Row3 = new Vector4(-sphereList[randomSphere].mSpherePosition.X, -(sphereList[randomSphere].mSpherePosition.Y - 1.6f), -(sphereList[randomSphere].mSpherePosition.Z + 1), 1);
+                    }
+                }
+            }
             #endregion
 
             #region Time
@@ -851,6 +905,19 @@ namespace Labs.ACW
                         sphereList[i].mSphereVelocity.Y = temporaryVelocity;
 
                         sphereList[i].mSpherePosition.X = -sphereList[i].mSpherePosition.Y + 0.6f;
+
+                        if (sphereList[i].mSpherePosition.X > 0)
+                        {
+                            sphereList[i].mSpherePosition.X = sphereList[i].mSpherePosition.X - sphereList[i].mSphereRadius;
+                        }
+                        else
+                        {
+                            if (sphereList[i].mSpherePosition.X < 0)
+                            {
+                                sphereList[i].mSpherePosition.X = sphereList[i].mSpherePosition.X + sphereList[i].mSphereRadius;
+                            }
+                        }
+
                         sphereList[i].mSpherePosition.Y = -0.8f + sphereList[i].mSphereRadius;
                     }
                     else
@@ -879,18 +946,33 @@ namespace Labs.ACW
                     Vector3 normal = new Vector3(0, -1, 0);
                     sphereList[i].mSphereVelocity = (sphereList[i].mSphereVelocity - 2 * Vector3.Dot(normal, sphereList[i].mSphereVelocity) * normal) * coefficientOfRestitution;
                 }
-
-                if (!collision && sphereList[i].mSpherePosition.Y - sphereList[i].mSphereRadius <= -0.8)
+                else
                 {
-                    collision = true;
+                    if (!collision && sphereList[i].mSpherePosition.Y - sphereList[i].mSphereRadius <= -0.8)
+                    {
+                        collision = true;
 
-                    float temporaryVelocity = sphereList[i].mSphereVelocity.X;
+                        float temporaryVelocity = sphereList[i].mSphereVelocity.X;
 
-                    sphereList[i].mSphereVelocity.X = sphereList[i].mSphereVelocity.Y;
-                    sphereList[i].mSphereVelocity.Y = temporaryVelocity;
+                        sphereList[i].mSphereVelocity.X = sphereList[i].mSphereVelocity.Y;
+                        sphereList[i].mSphereVelocity.Y = temporaryVelocity;
 
-                    sphereList[i].mSpherePosition.Y = 0.6f - sphereList[i].mSpherePosition.X;
-                    sphereList[i].mSpherePosition.X = 0.2f - sphereList[i].mSphereRadius;
+                        sphereList[i].mSpherePosition.Y = 0.6f - sphereList[i].mSpherePosition.X;
+
+                        if (sphereList[i].mSpherePosition.Y > 0)
+                        {
+                            sphereList[i].mSpherePosition.Y = sphereList[i].mSpherePosition.Y - sphereList[i].mSphereRadius;
+                        }
+                        else
+                        {
+                            if (sphereList[i].mSpherePosition.Y < 0)
+                            {
+                                sphereList[i].mSpherePosition.Y = sphereList[i].mSpherePosition.Y + sphereList[i].mSphereRadius;
+                            }
+                        }
+
+                        sphereList[i].mSpherePosition.X = 0.2f - sphereList[i].mSphereRadius;
+                    }
                 }
 
                 if (!collision && (sphereList[i].mSpherePosition.Z + sphereList[i].mSphereRadius >= 0.2 || sphereList[i].mSpherePosition.Z - sphereList[i].mSphereRadius <= -0.2))
@@ -1011,9 +1093,9 @@ namespace Labs.ACW
 
                 if (!collision)
                 {
-                    Vector3 L1p;
-                    Vector3 L2p;
-                    Vector3 dot;
+                    Vector3 position1;
+                    Vector3 position2;
+                    Vector3 dot1;
                     Vector3 dot2;
                     Vector3 A;
                     Vector3 result;
@@ -1022,13 +1104,13 @@ namespace Labs.ACW
 
                     for (int j = 0; j < 3; j++)
                     {
-                        L1p = cylinderArray[j].mCylinderPosition;
-                        L2p = L1p + new Vector3(0, 0, 1);
-                        dot = new Vector3(sphereList[i].mSpherePosition - L2p);
-                        dot2 = (L1p - L2p).Normalized();
-                        A = ((dot.X * dot2.X) + (dot.Y * dot2.Y) + (dot.Z * dot2.Z)) * dot2;
-                        result = L2p + A - sphereList[i].mSpherePosition;
-                        B = L2p + A;
+                        position1 = cylinderArray[j].mCylinderPosition;
+                        position2 = position1 + new Vector3(0, 0, 1);
+                        dot1 = new Vector3(sphereList[i].mSpherePosition - position2);
+                        dot2 = (position1 - position2).Normalized();
+                        A = ((dot1.X * dot2.X) + (dot1.Y * dot2.Y) + (dot1.Z * dot2.Z)) * dot2;
+                        result = position2 + A - sphereList[i].mSpherePosition;
+                        B = position2 + A;
                         cylinderRadius = sphereList[i].mSphereRadius + cylinderArray[j].mCylinderRadius;
 
                         if (result.Length <= cylinderRadius)
@@ -1045,13 +1127,13 @@ namespace Labs.ACW
 
                     if (!collision)
                     {
-                        L1p = cylinderArray[3].mCylinderPosition;
-                        L2p = L1p + new Vector3(1, 0, 0);
-                        dot = new Vector3(sphereList[i].mSpherePosition - L2p);
-                        dot2 = (L1p - L2p).Normalized();
-                        A = ((dot.X * dot2.X) + (dot.Y * dot2.Y) + (dot.Z * dot2.Z)) * dot2;
-                        result = L2p + A - sphereList[i].mSpherePosition;
-                        B = L2p + A;
+                        position1 = cylinderArray[3].mCylinderPosition;
+                        position2 = position1 + new Vector3(1, 0, 0);
+                        dot1 = new Vector3(sphereList[i].mSpherePosition - position2);
+                        dot2 = (position1 - position2).Normalized();
+                        A = ((dot1.X * dot2.X) + (dot1.Y * dot2.Y) + (dot1.Z * dot2.Z)) * dot2;
+                        result = position2 + A - sphereList[i].mSpherePosition;
+                        B = position2 + A;
                         cylinderRadius = sphereList[i].mSphereRadius + cylinderArray[3].mCylinderRadius;
 
                         if (result.Length <= cylinderRadius)
@@ -1066,13 +1148,13 @@ namespace Labs.ACW
 
                     if (!collision)
                     {
-                        L1p = cylinderArray[4].mCylinderPosition;
-                        L2p = L1p + new Vector3(3, 2, -3);
-                        dot = new Vector3(sphereList[i].mSpherePosition - L2p);
-                        dot2 = (L1p - L2p).Normalized();
-                        A = ((dot.X * dot2.X) + (dot.Y * dot2.Y) + (dot.Z * dot2.Z)) * dot2;
-                        result = L2p + A - sphereList[i].mSpherePosition;
-                        B = L2p + A;
+                        position1 = cylinderArray[4].mCylinderPosition;
+                        position2 = position1 + new Vector3(3, 2, -3);
+                        dot1 = new Vector3(sphereList[i].mSpherePosition - position2);
+                        dot2 = (position1 - position2).Normalized();
+                        A = ((dot1.X * dot2.X) + (dot1.Y * dot2.Y) + (dot1.Z * dot2.Z)) * dot2;
+                        result = position2 + A - sphereList[i].mSpherePosition;
+                        B = position2 + A;
                         cylinderRadius = sphereList[i].mSphereRadius + cylinderArray[4].mCylinderRadius;
 
                         if (result.Length <= cylinderRadius)
@@ -1088,13 +1170,13 @@ namespace Labs.ACW
 
                     if (!collision)
                     {
-                        L1p = cylinderArray[5].mCylinderPosition;
-                        L2p = L1p + new Vector3(1, 0, 1);
-                        dot = new Vector3(sphereList[i].mSpherePosition - L2p);
-                        dot2 = (L1p - L2p).Normalized();
-                        A = ((dot.X * dot2.X) + (dot.Y * dot2.Y) + (dot.Z * dot2.Z)) * dot2;
-                        result = L2p + A - sphereList[i].mSpherePosition;
-                        B = L2p + A;
+                        position1 = cylinderArray[5].mCylinderPosition;
+                        position2 = position1 + new Vector3(1, 0, 1);
+                        dot1 = new Vector3(sphereList[i].mSpherePosition - position2);
+                        dot2 = (position1 - position2).Normalized();
+                        A = ((dot1.X * dot2.X) + (dot1.Y * dot2.Y) + (dot1.Z * dot2.Z)) * dot2;
+                        result = position2 + A - sphereList[i].mSpherePosition;
+                        B = position2 + A;
                         cylinderRadius = sphereList[i].mSphereRadius + cylinderArray[5].mCylinderRadius;
 
                         if (result.Length <= cylinderRadius)

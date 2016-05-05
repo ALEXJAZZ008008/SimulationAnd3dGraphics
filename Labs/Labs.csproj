@@ -66,8 +66,14 @@
     <None Include="ACW\Shaders\fLighting.frag">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="ACW\Shaders\fLighting2.frag">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="ACW\Shaders\vPassThrough.vert">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="ACW\Shaders\vPassThrough2.vert">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="App.config" />
     <None Include="Lab2\Shaders\fSimple.frag">
@@ -136,6 +142,9 @@
     <Folder Include="Challenge\Shaders\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="ACW\MaxResDefault.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Lab5\11884091_1000345359997175_3654872641334187195_o - Copy.jpg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
